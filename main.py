@@ -7,7 +7,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.base import runTouchApp
 from kivy.uix.screenmanager import ScreenManager, Screen
 #these are the imports
-s = Slider(min=0, max=100, value=50)
+
 sm = ScreenManager()
 screen = Screen(name='mainpage')
 
