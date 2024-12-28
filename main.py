@@ -2,8 +2,7 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
-user = str("")
-passw = str("")
+
 def create_user(username, password):
         with open('users.json', 'r+') as file:
             try:
@@ -16,15 +15,12 @@ def create_user(username, password):
             json.dump(data, file, indent=4)
         pass
 
-def authenticate_user(username, password):
-    with open('users.json', 'r') as file:
-        data = json.load(file)
-        return data.get(username) == password
-    pass
+
+
 
 # Create a new user
 
-create_user('test', 'pass')
+create_user('user', 'pass')
 '''
 create_user('john', 'password123')
 
@@ -50,7 +46,7 @@ else:
 # you can control the ScreenManager from kv. Each screen has by default a
 # property manager that gives you the instance of the ScreenManager used.
 Builder.load_string("""
-#:import auth main.authenticate_user
+
                     
                   
 <MenuScreen>:
@@ -85,8 +81,7 @@ Builder.load_string("""
                     
 <Sign_In>:
     
-    f_username: username
-    f_password: password
+   
     GridLayout:
 
         rows: 2
@@ -97,6 +92,8 @@ Builder.load_string("""
             text: "Username"
         TextInput:
             id: username
+            on_focus: app.update_user(self.text, self.focus)
+            
             
         Label:
            
@@ -104,10 +101,11 @@ Builder.load_string("""
         TextInput:
             id: password
             password: True
+            on_focus: app.update_pass(self.text, self.focus)
         Button:
             text: 'Done'
             on_press:
-                if auth(username, password):  print("Login successful!")   
+                if app.authenticate_user(): print("Login successful!")   
                 else: print("bad")
                     
                 
@@ -146,7 +144,7 @@ class Sign_Up(Screen):
 
 
 
-class TestApp(App):
+class Kiosk(App):
 
 
 
@@ -167,6 +165,31 @@ class TestApp(App):
         
 
         return sm
+    def update_user(self, text, focus):
+        global user
+        if not focus:  # When the TextInput loses focus
+            user = str(text)
+            print(user)
+            
+            print("Variable updated:", user)
+
+    def update_pass(self, text, focus):
+        global passw
+        if not focus:  # When the TextInput loses focus
+            passw = str(text)
+            print(passw)
+            print("Variable updated:", passw)
+    
+
+    def authenticate_user(e):
+        print(user)
+        print(passw)
+        with open('users.json', 'r') as file:
+            data = json.load(file)
+            return data.get(user) == passw
+        pass
+
+
 
 if __name__ == '__main__':
-    TestApp().run()
+    Kiosk().run()
