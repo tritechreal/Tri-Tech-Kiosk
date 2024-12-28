@@ -8,14 +8,9 @@ import json
 
 
 
-# Create  screens. Please note the root.manager.current: this is how
-# you can control the ScreenManager from kv. Each screen has by default a
-# property manager that gives you the instance of the ScreenManager used.
-
+#kv code for ui
 Builder.load_string("""
-
-                    
-                  
+                
 <MenuScreen>:
     BoxLayout:
         Button:
@@ -64,7 +59,6 @@ Builder.load_string("""
             
             
         Label:
-           
             text: "Password"
         TextInput:
             id: password
@@ -74,7 +68,7 @@ Builder.load_string("""
             text: 'Done'
             on_press:
                 if app.authenticate_user(): print("Login successful!")   
-                else: create_user()
+                else: print("error, no account found")
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
@@ -111,7 +105,6 @@ Builder.load_string("""
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
                     
-
     
 """)
 
@@ -135,14 +128,6 @@ class Sign_Up(Screen):
 
 class Kiosk(App):
 
-
-
-    
-
-
-
-
-
     def build(self):
         # Create the screen manager
         sm = ScreenManager()
@@ -151,15 +136,13 @@ class Kiosk(App):
         sm.add_widget(Account(name='Account'))
         sm.add_widget(Sign_In(name='sign_in'))
         sm.add_widget(Sign_Up(name='sign_up'))
-        
-
         return sm
+    
     def update_user(self, text, focus):
         global user
         if not focus:  # When the TextInput loses focus
             user = str(text)
             print(user)
-            
             print("Variable updated:", user)
 
     def update_pass(self, text, focus):
@@ -175,7 +158,6 @@ class Kiosk(App):
                 data = json.load(file)
             except json.decoder.JSONDecodeError:
                 data = {}
-
             data[user] = passw
             file.seek(0)
             json.dump(data, file, indent=4)
