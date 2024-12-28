@@ -5,22 +5,26 @@ import json
 user = str("")
 passw = str("")
 def create_user(username, password):
-    with open('users.json', 'r+') as file:
-        try:
-            data = json.load(file)
-        except json.decoder.JSONDecodeError:
-            data = {}
+        with open('users.json', 'r+') as file:
+            try:
+                data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                data = {}
 
-        data[username] = password
-        file.seek(0)
-        json.dump(data, file, indent=4)
+            data[username] = password
+            file.seek(0)
+            json.dump(data, file, indent=4)
+        pass
 
 def authenticate_user(username, password):
     with open('users.json', 'r') as file:
         data = json.load(file)
         return data.get(username) == password
+    pass
 
 # Create a new user
+
+create_user('test', 'pass')
 '''
 create_user('john', 'password123')
 
@@ -46,6 +50,9 @@ else:
 # you can control the ScreenManager from kv. Each screen has by default a
 # property manager that gives you the instance of the ScreenManager used.
 Builder.load_string("""
+#:import auth main.authenticate_user
+                    
+                  
 <MenuScreen>:
     BoxLayout:
         Button:
@@ -100,10 +107,9 @@ Builder.load_string("""
         Button:
             text: 'Done'
             on_press:
-                if authenticate_user('john', 'password123'):
-                    print("Login successful!")
-                else:
-                    print("bad")
+                if auth(username, password):  print("Login successful!")   
+                else: print("bad")
+                    
                 
         
 <Sign_Up>:
@@ -141,6 +147,14 @@ class Sign_Up(Screen):
 
 
 class TestApp(App):
+
+
+
+    
+
+
+
+
 
     def build(self):
         # Create the screen manager
