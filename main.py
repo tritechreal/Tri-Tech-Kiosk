@@ -2,11 +2,9 @@ import kivy
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.slider import Slider
-from kivy.uix.dropdown import DropDown
 from kivy.base import runTouchApp
 from kivy.uix.screenmanager import ScreenManager, Screen
-#these are the imports
+#these are the imports                                                  imports for moduals 
 
 sm = ScreenManager()
 screen = Screen(name='mainpage')
@@ -42,4 +40,4 @@ class TestApp(App):
         return grid
         
 if __name__ == '__main__':
-    TestApp().run()
+    TestApp().run() #runs main code
