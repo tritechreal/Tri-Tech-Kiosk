@@ -1,6 +1,46 @@
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
+import json
+user = str("")
+passw = str("")
+def create_user(username, password):
+    with open('users.json', 'r+') as file:
+        try:
+            data = json.load(file)
+        except json.decoder.JSONDecodeError:
+            data = {}
+
+        data[username] = password
+        file.seek(0)
+        json.dump(data, file, indent=4)
+
+def authenticate_user(username, password):
+    with open('users.json', 'r') as file:
+        data = json.load(file)
+        return data.get(username) == password
+
+# Create a new user
+'''
+create_user('john', 'password123')
+
+# Authenticate a user
+if authenticate_user('john', 'password123'):
+    print("Login successful!")
+else:
+    print("Invalid username or password.")
+'''
+
+
+
+
+
+
+
+
+
+
+
 
 # Create  screens. Please note the root.manager.current: this is how
 # you can control the ScreenManager from kv. Each screen has by default a
@@ -37,17 +77,35 @@ Builder.load_string("""
             on_press: root.manager.current = 'menu'
                     
 <Sign_In>:
-    BoxLayout:
-        Button:
-            text: 'Email'
-            
-        Button:
-            text: 'Password'
     
-        Button:
-            text: 'Back to menu'
-            on_press: root.manager.current = 'menu'
+    f_username: username
+    f_password: password
+    GridLayout:
 
+        rows: 2
+        cols: 2
+        padding: 10
+        spacing: 10
+        Label:  
+            text: "Username"
+        TextInput:
+            id: username
+            
+        Label:
+           
+            text: "Password"
+        TextInput:
+            id: password
+            password: True
+        Button:
+            text: 'Done'
+            on_press:
+                if authenticate_user('john', 'password123'):
+                    print("Login successful!")
+                else:
+                    print("bad")
+                
+        
 <Sign_Up>:
     BoxLayout:
         Button:
@@ -59,6 +117,9 @@ Builder.load_string("""
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
+                    
+
+    
 """)
 
 # Declare all screens
@@ -77,6 +138,8 @@ class Sign_In(Screen):
 class Sign_Up(Screen):
     pass
 
+
+
 class TestApp(App):
 
     def build(self):
@@ -87,6 +150,7 @@ class TestApp(App):
         sm.add_widget(Account(name='Account'))
         sm.add_widget(Sign_In(name='sign_in'))
         sm.add_widget(Sign_Up(name='sign_up'))
+        
 
         return sm
 
