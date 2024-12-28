@@ -3,40 +3,6 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
 
-def create_user(username, password):
-        with open('users.json', 'r+') as file:
-            try:
-                data = json.load(file)
-            except json.decoder.JSONDecodeError:
-                data = {}
-
-            data[username] = password
-            file.seek(0)
-            json.dump(data, file, indent=4)
-        pass
-
-
-
-
-# Create a new user
-
-create_user('user', 'pass')
-'''
-create_user('john', 'password123')
-
-# Authenticate a user
-if authenticate_user('john', 'password123'):
-    print("Login successful!")
-else:
-    print("Invalid username or password.")
-'''
-
-
-
-
-
-
-
 
 
 
@@ -45,6 +11,7 @@ else:
 # Create  screens. Please note the root.manager.current: this is how
 # you can control the ScreenManager from kv. Each screen has by default a
 # property manager that gives you the instance of the ScreenManager used.
+
 Builder.load_string("""
 
                     
@@ -59,6 +26,7 @@ Builder.load_string("""
             on_press: root.manager.current = 'Account'
         Button:
             text: 'Quit'
+            on_press: raise Exception("User quit program")
 
 <SettingsScreen>:
     BoxLayout:
@@ -84,7 +52,7 @@ Builder.load_string("""
    
     GridLayout:
 
-        rows: 2
+        rows: 3
         cols: 2
         padding: 10
         spacing: 10
@@ -106,18 +74,39 @@ Builder.load_string("""
             text: 'Done'
             on_press:
                 if app.authenticate_user(): print("Login successful!")   
-                else: print("bad")
+                else: create_user()
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
                     
                 
         
 <Sign_Up>:
-    BoxLayout:
-        Button:
-            text: 'Email'
+    GridLayout:
+
+        rows: 3
+        cols: 2
+        padding: 10
+        spacing: 10
+        Label:  
+            text: "Username"
+        TextInput:
+            id: username
+            on_focus: app.update_user(self.text, self.focus)
             
+            
+        Label:
+           
+            text: "Password"
+        TextInput:
+            id: password
+            password: True
+            on_focus: app.update_pass(self.text, self.focus)
         Button:
-            text: 'Password'
-    
+            text: 'Done'
+            on_press:
+                if app.authenticate_user(): print("Login successful!")   
+                else: app.create_user()
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
@@ -180,6 +169,17 @@ class Kiosk(App):
             print(passw)
             print("Variable updated:", passw)
     
+    def create_user(e):
+        with open('users.json', 'r+') as file:
+            try:
+                data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                data = {}
+
+            data[user] = passw
+            file.seek(0)
+            json.dump(data, file, indent=4)
+        pass
 
     def authenticate_user(e):
         print(user)
