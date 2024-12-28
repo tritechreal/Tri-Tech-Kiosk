@@ -1,43 +1,57 @@
-import kivy
 from kivy.app import App
-from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
-from kivy.base import runTouchApp
+from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-#these are the imports                                                  imports for moduals 
 
-sm = ScreenManager()
-screen = Screen(name='mainpage')
+# Create both screens. Please note the root.manager.current: this is how
+# you can control the ScreenManager from kv. Each screen has by default a
+# property manager that gives you the instance of the ScreenManager used.
+Builder.load_string("""
+<MenuScreen>:
+    BoxLayout:
+        Button:
+            text: 'Goto settings'
+            on_press: root.manager.current = 'settings'
+        Button:
+            text: 'Account'
+            on_press: root.manager.current = 'login'
+        Button:
+            text: 'Quit'
 
+<SettingsScreen>:
+    BoxLayout:
+        Button:
+            text: 'My settings button'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
+<Account>:
+    BoxLayout:
+        Button:
+            text: 'Login'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
+""")
+
+# Declare both screens
+class MenuScreen(Screen):
+    pass
+
+class SettingsScreen(Screen):
+    pass
+
+class Account(Screen):
+    pass
 class TestApp(App):
 
     def build(self):
-        grid = GridLayout(cols=5, rows=1) #defigns the rows and coloms for the grid of this screen
+        # Create the screen manager
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(SettingsScreen(name='settings'))
+        sm.add_widget(Account(name='login'))
 
-        def callback(instance, value):
-            print('My button <%s> state is <%s>' % (instance, value)) #figure this out pls
-            if instance == "0x0000017ABF501710": #This line dosent work
-                if value == "down":
-                    print("Goto Signing Screen")
-        btn1 = Button(text='Hello world 1')
-        btn1.bind(state=callback)
+        return sm
 
-
-        sign_in = Button(text='Sign In')
-        sign_in.bind(state=callback)
-        #These are not needed so they can be gone
-        
-        #grid.add_widget(Button(text="Upload Fish"))
-        #grid.add_widget(Button(text="Leaderboard"))
-        #grid.add_widget(Button(text="Fish Stats"))
-        #grid.add_widget(Button(text="Sign in"))
-        
-        grid.add_widget(btn1)
-        grid.add_widget(sign_in)
-        
-        screen = Screen(name='sign in')
-        sm.add_widget(screen)
-        return grid
-        
 if __name__ == '__main__':
-    TestApp().run() #runs main code
+    TestApp().run()
