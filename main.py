@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import json
 global user
 global passw
+
 #kv code for ui
 Builder.load_string("""
                 
