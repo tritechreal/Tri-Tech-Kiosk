@@ -3,7 +3,8 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
 import Camera as C
-
+global user
+global passw
 
 
 
@@ -164,13 +165,18 @@ class Kiosk(App):
         pass
 
     def authenticate_user(e):
-        print(user)
-        print(passw)
-        with open('users.json', 'r') as file:
-            data = json.load(file)
-            return data.get(user) == passw
-        pass
-
+        if not user or not passw:
+            print("Cant create blank user")
+        else:
+            with open('users.json', 'r+') as file:
+                try:
+                    data = json.load(file)
+                except json.decoder.JSONDecodeError:
+                    data = {}
+                data[user] = passw
+                file.seek(0)
+                json.dump(data, file, indent=4)
+            pass
 
 
 if __name__ == '__main__':
