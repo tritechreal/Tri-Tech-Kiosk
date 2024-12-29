@@ -2,12 +2,8 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
-
-
-
-
-
-
+global user
+global passw
 #kv code for ui
 Builder.load_string("""
                 
@@ -43,8 +39,6 @@ Builder.load_string("""
             on_press: root.manager.current = 'menu'
                     
 <Sign_In>:
-    
-   
     GridLayout:
 
         rows: 3
@@ -56,8 +50,6 @@ Builder.load_string("""
         TextInput:
             id: username
             on_focus: app.update_user(self.text, self.focus)
-            
-            
         Label:
             text: "Password"
         TextInput:
@@ -73,8 +65,7 @@ Builder.load_string("""
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
                     
-                
-        
+                   
 <Sign_Up>:
     GridLayout:
 
@@ -87,8 +78,7 @@ Builder.load_string("""
         TextInput:
             id: username
             on_focus: app.update_user(self.text, self.focus)
-            
-            
+ 
         Label:
            
             text: "Password"
@@ -96,6 +86,8 @@ Builder.load_string("""
             id: password
             password: True
             on_focus: app.update_pass(self.text, self.focus)
+                    
+
         Button:
             text: 'Done'
             on_press:
@@ -124,8 +116,7 @@ class Sign_In(Screen):
 class Sign_Up(Screen):
     pass
 
-
-
+#Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
 class Kiosk(App):
 
     def build(self):
@@ -138,7 +129,7 @@ class Kiosk(App):
         sm.add_widget(Sign_Up(name='sign_up'))
         return sm
     
-    def update_user(self, text, focus):
+    def update_user(self, text, focus): 
         global user
         if not focus:  # When the TextInput loses focus
             user = str(text)
@@ -164,6 +155,8 @@ class Kiosk(App):
         pass
 
     def authenticate_user(e):
+        if not user or not passw: #error handling, stops the code from crashing if both variables are empty
+            print("try again, some fields are empty or not updated")
         print(user)
         print(passw)
         with open('users.json', 'r') as file:
