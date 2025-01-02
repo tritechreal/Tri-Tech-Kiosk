@@ -181,31 +181,79 @@ class Kiosk(App):
             print(passw)
             print("Variable updated:", passw)
     
+
+
+    def load_data(filename):
+        """Loads data from a JSON file."""
+        try:
+            with open(filename, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}  # Return an empty dictionary if the file doesn't exist
+
+    def save_data(filename, data):
+        """Saves data to a JSON file."""
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=4)
+
     def create_user(e):
-        with open('users.json', 'r+') as file:
-            try:
-                data = json.load(file)
-            except json.decoder.JSONDecodeError:
-                data = {}
-            data[user] = passw
-            file.seek(0)
-            json.dump(data, file, indent=4)
-        pass
+        """Creates a new user with the given username and password."""
+        if not user or not passw:
+            print("Cannot create a blank user.")
+            return
+
+        users = load_data('users.json')
+        if user in users:
+            print("Username already exists.")
+        else:
+            users[user] = passw
+            save_data('users.json', users)
+            print(f"User {user} created successfully.")
 
     def authenticate_user(e):
+        """Authenticates a user based on the given username and password."""
         if not user or not passw:
-            print("Cant create blank user")
-        else:
-            with open('users.json', 'r+') as file:
-                try:
-                    data = json.load(file)
-                except json.decoder.JSONDecodeError:
-                    data = {}
-                data[user] = passw
-                file.seek(0)
-                json.dump(data, file, indent=4)
-            pass
+            print("Please provide both username and password.")
+            return False
 
+        users = load_data('users.json')
+        if user in users and users[user] == passw:
+            print(f"User {user} authenticated successfully.")
+            return True
+        else:
+            print("Invalid username or password.")
+            return False
+
+    def get_score(user):
+        """Retrieves the score for a given user."""
+        scores = load_data('scores.json')
+        return scores.get(user, 0)  # Return 0 if the user doesn't exist
+
+    def update_score(user, new_score):
+        """Updates the score for a given user."""
+        scores = load_data('scores.json')
+        scores[user] = new_score
+        save_data('scores.json', scores)
+
+    def reset_score(user):
+        """Resets the score for a given user."""
+        scores = load_data('scores.json')
+        if user in scores:
+            del scores[user]
+            save_data('scores.json', scores)
+
+    def reset_all_scores():
+        """Resets all stored scores."""
+        save_data('scores.json', {})  # Save an empty dictionary to reset all scores
+
+    '''# Example usage
+    create_user("Alice", "password123")
+    if authenticate_user("Alice", "password123"):
+        update_score("Alice", 150)
+        print(f"Alice's score: {get_score('Alice')}")
+        reset_score("Alice")
+        print(f"Alice's score after reset: {get_score('Alice')}")
+'''
 
 if __name__ == '__main__':
     Kiosk().run()
