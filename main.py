@@ -17,6 +17,9 @@ Builder.load_string("""
             text: 'Account'
             on_press: root.manager.current = 'Account'
         Button:
+            text: 'Fishing Menu'
+            on_press: root.manager.current = 'Fish_Stuff'
+        Button:
             text: 'Quit'
             on_press: raise Exception("User quit program")
 
@@ -97,6 +100,32 @@ Builder.load_string("""
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
+
+<Fish_Stuff>:
+    BoxLayout:
+        Button:
+            text: 'Fish Stats'
+            on_press: root.manager.current = 'Fish_Stats'
+        Button:
+            text: 'Upload Fish'
+        
+        Button:
+            text: 'Leader Board'
+        
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
+
+<Fish_Stats>:
+    BoxLayout:
+        
+
+        Button:
+            text: 'Back'
+            on_press: root.manager.current = 'Fish_Stuff'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
                     
     
 """)
@@ -117,6 +146,12 @@ class Sign_In(Screen):
 class Sign_Up(Screen):
     pass
 
+class Fish_Stuff(Screen):
+    pass
+
+class Fish_Stats(Screen):
+    pass
+
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
 class Kiosk(App):
 
@@ -128,6 +163,8 @@ class Kiosk(App):
         sm.add_widget(Account(name='Account'))
         sm.add_widget(Sign_In(name='sign_in'))
         sm.add_widget(Sign_Up(name='sign_up'))
+        sm.add_widget(Fish_Stuff(name='Fish_Stuff'))
+        sm.add_widget(Fish_Stats(name='Fish_Stats'))
         return sm
     
     def update_user(self, text, focus): 
