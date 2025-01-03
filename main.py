@@ -5,7 +5,39 @@ import json
 global user
 global passw
 
-#kv code for ui
+
+def load_data(filename):
+    """Loads data from a JSON file."""
+    try:
+        with open(filename, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}  # Return an empty dictionary if the file doesn't exist
+
+def save_data(filename, data):
+    """Saves data to a JSON file."""
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
+
+def sync_users_and_scores():  #Ensures that all users have an entry in the scores file, setting the score to 0 if they are not already present.
+    try:
+        users = load_data('users.json')
+        scores = load_data('scores.json')
+        print("Users:", users)  # Debug: Print loaded users
+        print("Scores:", scores)  # Debug: Print loaded scores
+        for user in users:
+            if user not in scores:
+                scores[user] = 0
+                print(f"Added user {user} to scores with score 0.")
+        save_data('scores.json', scores)
+        print("Users and scores synchronized.")
+    except Exception as e:
+        print(f"An error occurred during synchronization: {e}")
+sync_users_and_scores()
+
+
+
+#kv code for ui--------------------------------------------------------------------------------------------------------------------------
 Builder.load_string("""
                 
 <MenuScreen>:
@@ -39,6 +71,9 @@ Builder.load_string("""
             text: 'Sign Up'
             on_press: root.manager.current = 'sign_up'
         Button:
+            text: 'My Stats'
+            on_press: root.manager.current = 'My_Stats'
+        Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
                     
@@ -68,8 +103,7 @@ Builder.load_string("""
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
-                    
-                   
+                           
 <Sign_Up>:
     GridLayout:
 
@@ -90,13 +124,30 @@ Builder.load_string("""
             id: password
             password: True
             on_focus: app.update_pass(self.text, self.focus)
-                    
-
         Button:
             text: 'Done'
             on_press:
                 if app.authenticate_user(): print("Login successful!")   
                 else: app.create_user()
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
+<My_Stats>:
+    GridLayout:
+        rows: 3
+        cols: 2
+        padding: 10
+        spacing: 10
+        Label:  
+            text: "My Stats"
+        
+        Label:
+            text: "Text 2"
+        
+        Button:
+            text: 'Refresh Stats'
+            on_press:
+                app.get_score()
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
@@ -118,8 +169,6 @@ Builder.load_string("""
 
 <Fish_Stats>:
     BoxLayout:
-        
-
         Button:
             text: 'Back'
             on_press: root.manager.current = 'Fish_Stuff'
@@ -127,9 +176,8 @@ Builder.load_string("""
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
                     
-    
 """)
-
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Declare all screens
 class MenuScreen(Screen):
     pass
@@ -144,6 +192,9 @@ class Sign_In(Screen):
     pass
 
 class Sign_Up(Screen):
+    pass
+
+class My_Stats(Screen):
     pass
 
 class Fish_Stuff(Screen):
@@ -163,6 +214,7 @@ class Kiosk(App):
         sm.add_widget(Account(name='Account'))
         sm.add_widget(Sign_In(name='sign_in'))
         sm.add_widget(Sign_Up(name='sign_up'))
+        sm.add_widget(My_Stats(name='My_Stats'))
         sm.add_widget(Fish_Stuff(name='Fish_Stuff'))
         sm.add_widget(Fish_Stats(name='Fish_Stats'))
         return sm
@@ -180,21 +232,6 @@ class Kiosk(App):
             passw = str(text)
             print(passw)
             print("Variable updated:", passw)
-    
-
-
-    def load_data(filename):
-        """Loads data from a JSON file."""
-        try:
-            with open(filename, "r") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            return {}  # Return an empty dictionary if the file doesn't exist
-
-    def save_data(filename, data):
-        """Saves data to a JSON file."""
-        with open(filename, "w") as f:
-            json.dump(data, f, indent=4)
 
     def create_user(e):
         """Creates a new user with the given username and password."""
@@ -209,7 +246,6 @@ class Kiosk(App):
             users[user] = passw
             save_data('users.json', users)
             print(f"User {user} created successfully.")
-
     def authenticate_user(e):
         """Authenticates a user based on the given username and password."""
         if not user or not passw:
@@ -223,10 +259,10 @@ class Kiosk(App):
         else:
             print("Invalid username or password.")
             return False
-
-    def get_score(user):
+    def get_score(e):
         """Retrieves the score for a given user."""
         scores = load_data('scores.json')
+        print(scores.get(user, 0))
         return scores.get(user, 0)  # Return 0 if the user doesn't exist
 
     def update_score(user, new_score):
@@ -246,14 +282,6 @@ class Kiosk(App):
         """Resets all stored scores."""
         save_data('scores.json', {})  # Save an empty dictionary to reset all scores
 
-    '''# Example usage
-    create_user("Alice", "password123")
-    if authenticate_user("Alice", "password123"):
-        update_score("Alice", 150)
-        print(f"Alice's score: {get_score('Alice')}")
-        reset_score("Alice")
-        print(f"Alice's score after reset: {get_score('Alice')}")
-'''
-
+    
 if __name__ == '__main__':
     Kiosk().run()
