@@ -2,8 +2,8 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
-global user
-global passw
+user = None
+passw = None
 
 
 def load_data(filename):
@@ -37,7 +37,7 @@ sync_users_and_scores()
 
 
 
-#kv code for ui--------------------------------------------------------------------------------------------------------------------------
+#region kv code for ui 
 Builder.load_string("""
                 
 <MenuScreen>:
@@ -88,13 +88,13 @@ Builder.load_string("""
             text: "Username"
         TextInput:
             id: username
-            on_focus: app.update_user(self.text, self.focus)
+            on_text: app.update_user(self.text)
         Label:
             text: "Password"
         TextInput:
             id: password
             password: True
-            on_focus: app.update_pass(self.text, self.focus)
+            on_text: app.update_pass(self.text)
         Button:
             text: 'Done'
             on_press:
@@ -115,7 +115,7 @@ Builder.load_string("""
             text: "Username"
         TextInput:
             id: username
-            on_focus: app.update_user(self.text, self.focus)
+            on_text: app.update_user(self.text)
  
         Label:
            
@@ -123,7 +123,7 @@ Builder.load_string("""
         TextInput:
             id: password
             password: True
-            on_focus: app.update_pass(self.text, self.focus)
+            on_text: app.update_pass(self.text)
         Button:
             text: 'Done'
             on_press:
@@ -177,7 +177,7 @@ Builder.load_string("""
             on_press: root.manager.current = 'menu'
                     
 """)
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+#endregion
 # Declare all screens
 class MenuScreen(Screen):
     pass
@@ -219,19 +219,18 @@ class Kiosk(App):
         sm.add_widget(Fish_Stats(name='Fish_Stats'))
         return sm
     
-    def update_user(self, text, focus): 
+    def update_user(self, text): 
         global user
-        if not focus:  # When the TextInput loses focus
-            user = str(text)
-            print(user)
-            print("Variable updated:", user)
+        user = str(text)
+        print(user)
+        print("Variable updated:", user)
 
-    def update_pass(self, text, focus):
+    def update_pass(self, text):
         global passw
-        if not focus:  # When the TextInput loses focus
-            passw = str(text)
-            print(passw)
-            print("Variable updated:", passw)
+       
+        passw = str(text)
+        print(passw)
+        print("Variable updated:", passw)
 
     def create_user(e):
         """Creates a new user with the given username and password."""
@@ -282,6 +281,20 @@ class Kiosk(App):
         """Resets all stored scores."""
         save_data('scores.json', {})  # Save an empty dictionary to reset all scores
 
+    def find_highest_score():
+        score_list = list()
+        users = load_data('users.json')
+        scores = load_data('scores.json')
+       # print("Users:", users)  # Debug: Print loaded users
+        #print("Scores:", scores)  # Debug: Print loaded scores
+        for user in users:
+            score_list.append(scores[user])
+            print(f"Added user {user} with score of {scores[user]}")
+        score_list.sort()
+        print(score_list)
+        return score_list
     
 if __name__ == '__main__':
+    print(Kiosk.find_highest_score())
+    
     Kiosk().run()
