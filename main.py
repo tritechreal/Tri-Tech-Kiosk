@@ -23,17 +23,17 @@ def sync_users_and_scores():  #Ensures that all users have an entry in the score
     try:
         users = load_data('users.json')
         scores = load_data('scores.json')
-        print("Users:", users)  # Debug: Print loaded users
-        print("Scores:", scores)  # Debug: Print loaded scores
+       #print("Users:", users)  # Debug: Print loaded users
+       #print("Scores:", scores)  # Debug: Print loaded scores
         for user in users:
-            if user not in scores:
+            if user not in scores: #if the user is not present, add them
                 scores[user] = 0
                 print(f"Added user {user} to scores with score 0.")
         save_data('scores.json', scores)
         print("Users and scores synchronized.")
     except Exception as e:
         print(f"An error occurred during synchronization: {e}")
-sync_users_and_scores()
+sync_users_and_scores() #keeps new accounts on the scores list to keep original account system
 
 
 
@@ -282,26 +282,22 @@ class Kiosk(App):
         save_data('scores.json', {})  # Save an empty dictionary to reset all scores
 
     def find_highest_score():
-        score_list = list()
+        score_list = list() #preps to convert the json of scores to a list for sorting
         users = load_data('users.json')
         scores = load_data('scores.json')
-       # print("Users:", users)  # Debug: Print loaded users
-        #print("Scores:", scores)  # Debug: Print loaded scores
         for user in users:
             score_list.append(scores[user])
             print(f"Added user {user} with score of {scores[user]}")
-
-        score_list.sort()
-        for user in users:
-            if scores[user] == score_list[-1]:
+        score_list.sort() #this line sorts the list
+        for user in users: #for each user in the user list (repeats for duration  of the user list)
+            if scores[user] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
                 return user, score_list[-1]
-                print([user, score_list[-1]])
+               #print([user, score_list[-1]])  here for debug
                 break
             else:
-                print("trying again")
+                print("trying again") #fail safe if there is some error with the first result
         
     
 if __name__ == '__main__':
-    print(Kiosk.find_highest_score())
-    
+    print(Kiosk.find_highest_score()) #this is hear for testing
     Kiosk().run()
