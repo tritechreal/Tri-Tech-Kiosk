@@ -178,7 +178,7 @@ Builder.load_string("""
                     
 """)
 #endregion
-# Declare all screens
+# Declare all screens... and yes you need it
 class MenuScreen(Screen):
     pass
 
@@ -207,7 +207,7 @@ class Fish_Stats(Screen):
 class Kiosk(App):
 
     def build(self):
-        # Create the screen manager
+        # Create the screen manager and sets up everything for navigation
         sm = ScreenManager()
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(SettingsScreen(name='settings'))
@@ -219,20 +219,17 @@ class Kiosk(App):
         sm.add_widget(Fish_Stats(name='Fish_Stats'))
         return sm
     
-    def update_user(self, text): 
+    def update_user(self, text): #for sign in and creaiting account
         global user
         user = str(text)
-        print(user)
-        print("Variable updated:", user)
+        print("Variable updated:", user) #can comment these out, primarily for debug
 
-    def update_pass(self, text):
+    def update_pass(self, text): #for sign in and creaiting account
         global passw
-       
         passw = str(text)
-        print(passw)
-        print("Variable updated:", passw)
+        print("Variable updated:", passw) #can comment these out, primarily for debug
 
-    def create_user(e):
+    def create_user(e): #creates new user
         """Creates a new user with the given username and password."""
         if not user or not passw:
             print("Cannot create a blank user.")
@@ -245,12 +242,11 @@ class Kiosk(App):
             users[user] = passw
             save_data('users.json', users)
             print(f"User {user} created successfully.")
-    def authenticate_user(e):
+    def authenticate_user(e): #Login existing user
         """Authenticates a user based on the given username and password."""
         if not user or not passw:
             print("Please provide both username and password.")
             return False
-
         users = load_data('users.json')
         if user in users and users[user] == passw:
             print(f"User {user} authenticated successfully.")
@@ -297,7 +293,8 @@ class Kiosk(App):
             else:
                 print("trying again") #fail safe if there is some error with the first result
         
-    
-if __name__ == '__main__':
+
+
+if __name__ == '__main__': #main python code goes here
     print(Kiosk.find_highest_score()) #this is hear for testing
     Kiosk().run()
