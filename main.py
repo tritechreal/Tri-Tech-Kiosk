@@ -290,9 +290,16 @@ class Kiosk(App):
         for user in users:
             score_list.append(scores[user])
             print(f"Added user {user} with score of {scores[user]}")
+
         score_list.sort()
-        print(score_list)
-        return score_list
+        for user in users:
+            if scores[user] == score_list[-1]:
+                return user, score_list[-1]
+                print([user, score_list[-1]])
+                break
+            else:
+                print("trying again")
+        
     
 if __name__ == '__main__':
     print(Kiosk.find_highest_score())
