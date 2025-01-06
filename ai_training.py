@@ -1,42 +1,23 @@
-import tflite_runtime.interpreter as tflite
-import cv2
-import numpy as np
+import os
 
-# Load the TensorFlow Lite model
-interpreter = tflite.Interpreter(model_path='path/to/your/model.tflite')
-interpreter.allocate_tensors()
+from tflite_model_maker import model_spec
+from tflite_model_maker import object_detector
+from tflite_model_maker.config import ExportFormat
+from tflite_model_maker.config import QuantizationConfig
+from tflite_model_maker.object_detector import DataLoader
 
-# Get input and output details
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+train_data = DataLoader.from_pascal_voc(
+    images_dir='/path/to/images', 
+    annotations_dir='/path/to/annotations', 
+    label_map={1: "your_label_1", 2: "your_label_2"}  # Update with your labels
+)
 
-# Initialize the Raspberry Pi AI camera
-camera = cv2.VideoCapture(0)
+train_data, validation_data = train_data.split(0.8)  # 80% for training
 
-# Capture an image
-ret, frame = camera.read()
+spec = model_spec.get('efficientdet_lite0')
 
-# Pre-process the image
-input_data = cv2.resize(frame, (input_details[0]['shape'][1], input_details[0]['shape'][2]))
-input_data = np.expand_dims(input_data, axis=0)
-input_data = input_data.astype(np.float32)
+model = object_detector.create(train_data, model_spec=spec, validation_data=validation_data, epochs=50, batch_size=8)  # Adjust epochs and batch_size as needed
 
-# Run inference
-interpreter.set_tensor(input_details[0]['index'], input_data)
-interpreter.invoke()
-
-# Get the output
-output_data = interpreter.get_tensor(output_details[0]['index'])
-
-# Calculate the bounding box area for each detected fish
-for i in range(len(output_data[0])):
-    if output_data[0][i][0] > 0.5:  # Adjust the threshold as needed
-        ymin = int(output_data[0][i][1] * frame.shape[0])
-        xmin = int(output_data[0][i][2] * frame.shape[1])
-        ymax = int(output_data[0][i][3] * frame.shape[0])
-        xmax = int(output_data[0][i][4] * frame.shape[1])
-        area = (ymax - ymin) * (xmax - xmin)
-        print(f"Fish {i+1} bounding box area: {area} pixels")
-
-# Release the camera
-camera.release()
+model.evaluate(validation_data)
+config = QuantizationConfig.for_float16()  # Or other quantization options
+model.export(export_dir='.', tflite_filename='my_quantized_model.tflite', quantization_config=config)
