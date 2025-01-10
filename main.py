@@ -288,7 +288,7 @@ class Kiosk(App):
         score_list.sort() #this line sorts the list
         for user in users: #for each user in the user list (repeats for duration  of the user list)
             if scores[user] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
-                return user#, score_list[-1]
+                return user, score_list[-1]
                #print([user, score_list[-1]])  here for debug
                 break
             else:
