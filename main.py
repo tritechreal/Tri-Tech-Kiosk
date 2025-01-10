@@ -142,12 +142,13 @@ Builder.load_string("""
             text: "My Stats"
         
         Label:
-            text: "Text 2"
+            id: your_score
+            text: str(app.get_score())
         
         Button:
             text: 'Refresh Stats'
             on_press:
-                app.get_score()
+                your_score.text = str(app.get_score())
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
@@ -277,7 +278,7 @@ class Kiosk(App):
         """Resets all stored scores."""
         save_data('scores.json', {})  # Save an empty dictionary to reset all scores
 
-    def find_highest_score():
+    def find_highest_score(e):
         score_list = list() #preps to convert the json of scores to a list for sorting
         users = load_data('users.json')
         scores = load_data('scores.json')
@@ -287,7 +288,7 @@ class Kiosk(App):
         score_list.sort() #this line sorts the list
         for user in users: #for each user in the user list (repeats for duration  of the user list)
             if scores[user] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
-                return user, score_list[-1]
+                return user#, score_list[-1]
                #print([user, score_list[-1]])  here for debug
                 break
             else:
@@ -296,5 +297,6 @@ class Kiosk(App):
 
 
 if __name__ == '__main__': #main python code goes here
-    print(Kiosk.find_highest_score()) #this is hear for testing
-    Kiosk().run()
+    kiosk_app = Kiosk()
+    print(kiosk_app.find_highest_score()) #this is here for testing
+    kiosk_app.run()
