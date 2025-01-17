@@ -43,7 +43,7 @@ Builder.load_string("""
 <MenuScreen>:
     BoxLayout:
         Button:
-            text: 'Goto settings'
+            text: 'Settings'
             on_press: root.manager.current = 'settings'
         Button:
             text: 'Account'
@@ -57,6 +57,8 @@ Builder.load_string("""
 
 <SettingsScreen>:
     BoxLayout:
+        Button:
+            text: 'Debug'
         Button:
             text: 'My settings button'
         Button:
