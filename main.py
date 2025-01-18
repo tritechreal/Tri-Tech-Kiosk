@@ -165,11 +165,29 @@ Builder.load_string("""
         
         Button:
             text: 'Leader Board'
+            on_press: root.manager.current = 'Leader_Board'
         
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
-
+<Leader_Board>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Leaderboard'
+            font_size: 32
+        ScrollView:
+            BoxLayout:
+                id: leaderboard_box
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+        Label:
+            id: highest_score
+            text: 'Highest Score: ' + str(app.find_highest_score())
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
 <Fish_Stats>:
     BoxLayout:
         Button:
@@ -178,7 +196,9 @@ Builder.load_string("""
         Button:
             text: 'Back to menu'
             on_press: root.manager.current = 'menu'
-                    
+        Button:
+            text: 'Leader Board'
+            on_press: root.manager.current = 'Leader_Board'
 """)
 #endregion
 # Declare all screens... and yes you need it
@@ -206,6 +226,8 @@ class Fish_Stuff(Screen):
 class Fish_Stats(Screen):
     pass
 
+class Leader_Board(Screen):
+    pass
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
 class Kiosk(App):
 
@@ -220,6 +242,7 @@ class Kiosk(App):
         sm.add_widget(My_Stats(name='My_Stats'))
         sm.add_widget(Fish_Stuff(name='Fish_Stuff'))
         sm.add_widget(Fish_Stats(name='Fish_Stats'))
+        sm.add_widget(Leader_Board(name='Leader_Board'))
         return sm
     
     def update_user(self, text): #for sign in and creaiting account
