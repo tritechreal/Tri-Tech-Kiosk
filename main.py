@@ -4,8 +4,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import json
 user = None
 passw = None
+from kivy.core.window import Window
+from kivy.config import Config
 
-
+Config.read('config.ini')
 def load_data(filename):
     """Loads data from a JSON file."""
     try:
@@ -42,6 +44,7 @@ Builder.load_string("""
                 
 <MenuScreen>:
     BoxLayout:
+        
         Button:
             text: 'Settings'
             on_press: root.manager.current = 'settings'
@@ -90,6 +93,7 @@ Builder.load_string("""
             text: "Username"
         TextInput:
             id: username
+            use_bubble: True 
             on_text: app.update_user(self.text)
         Label:
             text: "Password"
@@ -212,6 +216,9 @@ class Account(Screen):
     pass
 
 class Sign_In(Screen):
+    def on_focus(self, instance, value):
+        if value: 
+            keyboard = Window.request_keyboard(self._keyboard_closed, self)
     pass
 
 class Sign_Up(Screen):
