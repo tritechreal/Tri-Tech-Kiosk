@@ -41,23 +41,39 @@ sync_users_and_scores() #keeps new accounts on the scores list to keep original 
 
 #region kv code for ui 
 Builder.load_string("""
+#:import Factory kivy.factory.Factory
                 
 <MenuScreen>:
     BoxLayout:
         
         Button:
-            text: 'Settings'
+            text: 'Settings  ' + '⚙️'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'settings'
         Button:
-            text: 'Account'
+            text: 'Account  ' + '👤'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'Account'
         Button:
-            text: 'Fishing Menu'
+            text: 'Fishing ' + '🐟🎣'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'Fish_Stuff'
         Button:
             text: 'Quit'
             on_press: raise Exception("User quit program")
-
+<MyPopup@Popup>:
+    auto_dismiss: False
+    on_dismiss: print("Popup dismissed")
+    title: 'You are now signed in!'         
+    Button:
+        text: 'You have been signed in! ✅' + '   (Click popup to continue)'
+        font_name: 'seguiemj'
+        font_size: 60
+        on_release: root.dismiss()
+    
 <SettingsScreen>:
     BoxLayout:
         Button:
@@ -65,21 +81,30 @@ Builder.load_string("""
         Button:
             text: 'My settings button'
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'menu'
 <Account>:
     BoxLayout:
         Button:
-            text: 'Sign In'
+            text: 'Sign In ' + '👤'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'sign_in'
         Button:
-            text: 'Sign Up'
+            text: 'Sign Up' + '➕👤'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'sign_up'
         Button:
             text: 'My Stats'
             on_press: root.manager.current = 'My_Stats'
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
                     
 <Sign_In>:
@@ -104,10 +129,15 @@ Builder.load_string("""
         Button:
             text: 'Done'
             on_press:
-                if app.authenticate_user(): print("Login successful!")   
+                if app.authenticate_user(): Factory.MyPopup().open()
+                   
+            
                 else: print("error, no account found")
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
                            
 <Sign_Up>:
@@ -133,10 +163,15 @@ Builder.load_string("""
         Button:
             text: 'Done'
             on_press:
-                if app.authenticate_user(): print("Login successful!")   
+                if app.authenticate_user(): Factory.MyPopup().open()   
                 else: app.create_user()
+                app.authenticate_user()
+                Factory.MyPopup().open()
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
 <My_Stats>:
     GridLayout:
@@ -152,27 +187,39 @@ Builder.load_string("""
             text: str(app.get_score())
         
         Button:
-            text: 'Refresh Stats'
+            text: 'Refresh Stats  ' + '🔃'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press:
                 your_score.text = str(app.get_score())
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
 
 <Fish_Stuff>:
     BoxLayout:
         Button:
-            text: 'Fish Stats'
+            text: 'Fish Stats  ' + '📊'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'Fish_Stats'
         Button:
             text: 'Upload Fish'
         
         Button:
-            text: 'Leader Board'
+            text: 'Leader Board  ' + '🥇🥈🥉'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'Leader_Board'
         
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
 <Leader_Board>:
     BoxLayout:
@@ -190,19 +237,25 @@ Builder.load_string("""
             id: highest_score
             text: 'Highest Score: ' + str(app.find_highest_score())
         Button:
-            text: 'Back to menu'
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
             on_press: root.manager.current = 'menu'
 <Fish_Stats>:
     BoxLayout:
         Button:
-            text: 'Back'
-            on_press: root.manager.current = 'Fish_Stuff'
-        Button:
-            text: 'Back to menu'
-            on_press: root.manager.current = 'menu'
-        Button:
-            text: 'Leader Board'
+            text: 'Leader Board  ' + '🥇🥈🥉'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'Leader_Board'
+        Button:
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
+            on_press: root.manager.current = 'menu'
+      
 """)
 #endregion
 # Declare all screens... and yes you need it
