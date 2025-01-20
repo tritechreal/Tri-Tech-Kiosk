@@ -62,7 +62,9 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'Fish_Stuff'
         Button:
-            text: 'Quit'
+            text: 'Quit ' + '❌'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: raise Exception("User quit program")
 <MyPopup@Popup>:
     auto_dismiss: False
@@ -77,7 +79,10 @@ Builder.load_string("""
 <SettingsScreen>:
     BoxLayout:
         Button:
-            text: 'Debug'
+            text: 'Debug' + '🛠️'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: root.manager.current = 'admin'
         Button:
             text: 'My settings button'
         Button:
@@ -98,7 +103,9 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'sign_up'
         Button:
-            text: 'My Stats'
+            text: 'My Stats ' + '👤📈'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press: root.manager.current = 'My_Stats'
         Button:
             text: 'Back  ' + '↩️'
@@ -115,19 +122,29 @@ Builder.load_string("""
         padding: 10
         spacing: 10
         Label:  
-            text: "Username"
+            text: "Username 👤"
+            font_name: 'seguiemj'
+            font_size: 40
         TextInput:
             id: username
             use_bubble: True 
             on_text: app.update_user(self.text)
+            font_name: 'seguiemj'
+            font_size: 40
         Label:
-            text: "Password"
+            text: "Password 🔑"
+            font_name: 'seguiemj'
+            font_size: 40
         TextInput:
             id: password
             password: True
             on_text: app.update_pass(self.text)
+            font_name: 'seguiemj'
+            font_size: 40
         Button:
-            text: 'Done'
+            text: 'Done ' + '✅'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press:
                 if app.authenticate_user(): Factory.MyPopup().open()
                    
@@ -148,20 +165,30 @@ Builder.load_string("""
         padding: 10
         spacing: 10
         Label:  
-            text: "Username"
+            text: "Username 👤"
+            font_name: 'seguiemj'
+            font_size: 40
         TextInput:
             id: username
             on_text: app.update_user(self.text)
+            font_name: 'seguiemj'
+            font_size: 40
  
         Label:
            
-            text: "Password"
+            text: "Password 🔑"
+            font_name: 'seguiemj'
+            font_size: 40
         TextInput:
             id: password
             password: True
             on_text: app.update_pass(self.text)
+            font_name: 'seguiemj'
+            font_size: 40
         Button:
-            text: 'Done'
+            text: 'Done' + '✅'
+            font_name: 'seguiemj'
+            font_size: 40
             on_press:
                 if app.authenticate_user(): Factory.MyPopup().open()   
                 else: app.create_user()
@@ -180,22 +207,26 @@ Builder.load_string("""
         padding: 10
         spacing: 10
         Label:  
-            text: "My Stats"
+            text: "My Score 📈"
+            font_name: 'seguiemj'
+            font_size: 80
         
         Label:
             id: your_score
             text: str(app.get_score())
+            font_name: 'seguiemj'
+            font_size: 80
         
         Button:
             text: 'Refresh Stats  ' + '🔃'
             font_name: 'seguiemj'
-            font_size: 40
+            font_size: 60
             on_press:
                 your_score.text = str(app.get_score())
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
-            font_size: 40
+            font_size: 60
          
             on_press: root.manager.current = 'menu'
 
@@ -225,8 +256,9 @@ Builder.load_string("""
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Leaderboard'
-            font_size: 32
+            text: 'Leaderboard ' + '🏆'
+            font_name: 'seguiemj'
+            font_size: 80
         ScrollView:
             BoxLayout:
                 id: leaderboard_box
@@ -235,7 +267,9 @@ Builder.load_string("""
                 height: self.minimum_height
         Label:
             id: highest_score
-            text: 'Highest Score: ' + str(app.find_highest_score())
+            text: '🥇 Highest Score: ' + str(app.find_highest_score())
+            font_name: 'seguiemj'
+            font_size: 80
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
@@ -255,6 +289,38 @@ Builder.load_string("""
             font_size: 40
          
             on_press: root.manager.current = 'menu'
+                    
+<admin>:
+    BoxLayout:
+        Button:
+            text: 'Reset  ' + '🔃'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: root.manager.current = 'reset'
+        Button:
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
+            on_press: root.manager.current = 'menu'
+<reset>:
+    BoxLayout:
+        Button:
+            text: 'Reset Score' + '♻️'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: app.reset_score(user)
+        Button:
+            text: 'Reset All Scores' + '♻️'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: app.reset_all_scores()
+        Button:
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+         
+            on_press: root.manager.current = 'admin'
       
 """)
 #endregion
@@ -288,8 +354,12 @@ class Fish_Stats(Screen):
 
 class Leader_Board(Screen):
     pass
+class admin(Screen):
+    pass
+class reset(Screen):
+    pass
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
-class Kiosk(App):
+class FishFlex(App):
 
     def build(self):
         # Create the screen manager and sets up everything for navigation
@@ -303,6 +373,9 @@ class Kiosk(App):
         sm.add_widget(Fish_Stuff(name='Fish_Stuff'))
         sm.add_widget(Fish_Stats(name='Fish_Stats'))
         sm.add_widget(Leader_Board(name='Leader_Board'))
+        sm.add_widget(admin(name='admin'))
+        sm.add_widget(reset(name='reset'))
+         # Set the initial screen to 'menu'
         return sm
     
     def update_user(self, text): #for sign in and creaiting account
@@ -382,6 +455,6 @@ class Kiosk(App):
 
 
 if __name__ == '__main__': #main python code goes here
-    kiosk_app = Kiosk()
+    kiosk_app = FishFlex() #easteregg
     print(kiosk_app.find_highest_score()) #this is here for testing
     kiosk_app.run()
