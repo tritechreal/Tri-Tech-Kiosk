@@ -238,7 +238,9 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'Fish_Stats'
         Button:
-            text: 'Upload Fish'
+            text: 'Upload Fish (Coming Soon)' + '🐟📸'
+            font_name: 'seguiemj'
+            font_size: 40
         
         Button:
             text: 'Leader Board  ' + '🥇🥈🥉'
@@ -267,9 +269,13 @@ Builder.load_string("""
                 height: self.minimum_height
         Label:
             id: highest_score
-            text: '🥇 Highest Score: ' + str(app.find_highest_score())
             font_name: 'seguiemj'
-            font_size: 80
+            font_size: 40
+        Button:
+            text: 'Refresh  ' + '🔃'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: highest_score.text = str(app.leaderboard())
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
@@ -284,6 +290,10 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'Leader_Board'
         Button:
+            text: 'Daily Catches ' + '📅🐟'
+            font_name: 'seguiemj'
+            font_size: 40
+        Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
             font_size: 40
@@ -297,6 +307,11 @@ Builder.load_string("""
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'reset'
+        Button:
+            text: 'List Users  ' + '👤'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: app.leaderboard()
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
@@ -432,9 +447,10 @@ class FishFlex(App):
             del scores[user]
             save_data('scores.json', scores)
 
-    def reset_all_scores():
+    def reset_all_scores(e):
         """Resets all stored scores."""
         save_data('scores.json', {})  # Save an empty dictionary to reset all scores
+        sync_users_and_scores() #resets the scores and ensures that all users have an entry in the scores file, setting the score to 0 if they are not already present.
 
     def find_highest_score(e):
         score_list = list() #preps to convert the json of scores to a list for sorting
@@ -453,6 +469,23 @@ class FishFlex(App):
                 print("trying again") #fail safe if there is some error with the first result
         
 
+
+    def leaderboard(e):
+        score_list = list() #preps to convert the json of scores to a list for sorting
+        users = load_data('users.json')
+        scores = load_data('scores.json')
+        output = list()
+        for user in users:
+            score_list.append(scores[user])
+            print(f"Added user {user} with score of {scores[user]}")
+        score_list.sort() #this line sorts the list
+        sorted_users = sorted(users.keys(), key=lambda x: scores[x], reverse=True)
+        for user in sorted_users:
+            print(f"{user}: {scores[user]}")
+        for i in range(0,3):
+            print(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
+            output.append(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
+        return output
 
 if __name__ == '__main__': #main python code goes here
     kiosk_app = FishFlex() #easteregg
