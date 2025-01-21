@@ -489,5 +489,4 @@ class FishFlex(App):
 
 if __name__ == '__main__': #main python code goes here
     kiosk_app = FishFlex() #easteregg
-    print(kiosk_app.find_highest_score()) #this is here for testing
     kiosk_app.run()
