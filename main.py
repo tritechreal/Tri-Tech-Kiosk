@@ -6,7 +6,8 @@ user = None
 passw = None
 from kivy.core.window import Window
 from kivy.config import Config
-
+import time
+print(time.localtime())
 Config.read('config.ini')
 def load_data(filename):
     """Loads data from a JSON file."""
@@ -213,7 +214,7 @@ Builder.load_string("""
         
         Label:
             id: your_score
-            text: str(app.get_score())
+            
             font_name: 'seguiemj'
             font_size: 80
         
@@ -293,13 +294,29 @@ Builder.load_string("""
             text: 'Daily Catches ' + '📅🐟'
             font_name: 'seguiemj'
             font_size: 40
+            on_press: root.manager.current = 'Daily_Catches'
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
             font_size: 40
          
             on_press: root.manager.current = 'menu'
-                    
+<Daily_Catches>:
+    BoxLayout:
+        Label:
+            id: daily_catches
+            font_name: 'seguiemj'
+            font_size: 40
+        Button:
+            text: 'Refresh  ' + '🔃'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: daily_catches.text = str(app.daily_stats())
+        Button:
+            text: 'Back  ' + '↩️'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: root.manager.current = 'Fish_Stats'                    
 <admin>:
     BoxLayout:
         Button:
@@ -307,6 +324,11 @@ Builder.load_string("""
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'reset'
+        Button:
+            text: 'computer vision initialize' + '🤖'
+            font_name: 'seguiemj'           
+            font_size: 40
+            on_press: app.computer_vision()
         Button:
             text: 'List Users  ' + '👤'
             font_name: 'seguiemj'
@@ -373,6 +395,8 @@ class admin(Screen):
     pass
 class reset(Screen):
     pass
+class Daily_Catches(Screen):
+    pass
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
 class FishFlex(App):
 
@@ -390,6 +414,7 @@ class FishFlex(App):
         sm.add_widget(Leader_Board(name='Leader_Board'))
         sm.add_widget(admin(name='admin'))
         sm.add_widget(reset(name='reset'))
+        sm.add_widget(Daily_Catches(name='Daily_Catches'))
          # Set the initial screen to 'menu'
         return sm
     
@@ -456,13 +481,13 @@ class FishFlex(App):
         score_list = list() #preps to convert the json of scores to a list for sorting
         users = load_data('users.json')
         scores = load_data('scores.json')
-        for user in users:
-            score_list.append(scores[user])
-            print(f"Added user {user} with score of {scores[user]}")
+        for user1 in users:
+            score_list.append(scores[user1])
+            print(f"Added user {user1} with score of {scores[user1]}")
         score_list.sort() #this line sorts the list
-        for user in users: #for each user in the user list (repeats for duration  of the user list)
-            if scores[user] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
-                return user, score_list[-1]
+        for user1 in users: #for each user in the user list (repeats for duration  of the user list)
+            if scores[user1] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
+                return user1, score_list[-1]
                #print([user, score_list[-1]])  here for debug
                 break
             else:
@@ -486,7 +511,53 @@ class FishFlex(App):
             print(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
             output.append(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
         return output
+    
+    
+    
+    
+    
+    def log_data(fish_type, length):
+        """Logs data for a given fish type and length."""
+        data = load_data('fish_data.json')
+        if fish_type not in data:
+            data[fish_type] = []
+        data[fish_type].extend([[length, user, time.time()]])
+        save_data('fish_data.json', data)
+    
+    def register_catch(e):
+        """Registers a catch for the given user."""
+        scores = load_data('scores.json')
+        if user in scores:
+            scores[user] += 1
+        else:
+            scores[user] = 1
+        save_data('scores.json', scores)
+        
+    def daily_stats(e):
+        """Calculates daily statistics for all users."""
+        data = load_data('fish_data.json')
+        daily_stats = {}
+        for fish_type, catches in data.items():
+            for catch in catches:
+                date = time.strftime("%Y-%m-%d", time.localtime(catch[2]))
+                if date not in daily_stats:
+                    daily_stats[date] = {}
+                if fish_type not in daily_stats[date]:
+                    daily_stats[date][fish_type] = 0
+                daily_stats[date][fish_type] += 1
+        return daily_stats
+    def computer_vision(e):
+        """Handles the computer vision aspect of the application."""
+        # Placeholder for computer vision code
+        FishFlex.log_data("fish", 10)  # Example: Log a fish catch with length 10
+        FishFlex.register_catch(None)  # Example: Register a catch for the user
+        pass
 
+    
+
+
+print(FishFlex.daily_stats("e"))
 if __name__ == '__main__': #main python code goes here
     kiosk_app = FishFlex() #easteregg
     kiosk_app.run()
+    
