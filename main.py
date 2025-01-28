@@ -262,26 +262,33 @@ Builder.load_string("""
             text: 'Leaderboard ' + '🏆'
             font_name: 'seguiemj'
             font_size: 80
-        ScrollView:
-            BoxLayout:
-                id: leaderboard_box
-                orientation: 'vertical'
-                size_hint_y: None
-                height: self.minimum_height
+        
         Label:
+            size_hint_y: None
+            size_hint_x: 0.6
+            text_size: self.width, None
+            height: self.texture_size[1]
             id: highest_score
             font_name: 'seguiemj'
-            font_size: 40
+            font_size: 80
         Button:
             text: 'Refresh  ' + '🔃'
             font_name: 'seguiemj'
-            font_size: 40
+            font_size: 80
+            size_hint_y: None
+            size_hint_x: 0.5
+            text_size: self.width, None
+            height: self.texture_size[1]
             on_press: highest_score.text = str(app.leaderboard())
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
-            font_size: 40
-         
+
+            font_size: 80
+            size_hint_y: None
+            size_hint_x: 0.5
+            text_size: self.width, None
+            height: self.texture_size[1]
             on_press: root.manager.current = 'menu'
 <Fish_Stats>:
     BoxLayout:
@@ -398,6 +405,7 @@ class reset(Screen):
 class Daily_Catches(Screen):
     pass
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
+#region main code
 class FishFlex(App):
 
     def build(self):
@@ -510,6 +518,7 @@ class FishFlex(App):
         for i in range(0,3):
             print(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
             output.append(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
+            print(output)
         return output
     
     
@@ -539,12 +548,16 @@ class FishFlex(App):
         daily_stats = {}
         for fish_type, catches in data.items():
             for catch in catches:
-                date = time.strftime("%Y-%m-%d", time.localtime(catch[2]))
-                if date not in daily_stats:
-                    daily_stats[date] = {}
-                if fish_type not in daily_stats[date]:
-                    daily_stats[date][fish_type] = 0
-                daily_stats[date][fish_type] += 1
+                current_time = catch[2]  # Get timestamp from catch data
+                today = time.strftime("%Y-%m-%d")  # Get today's date
+                catch_date = time.strftime("%Y-%m-%d", time.localtime(current_time))
+                
+                if catch_date == today:  # Only process catches from today
+                    if catch_date not in daily_stats:
+                        daily_stats[catch_date] = {}
+                    if fish_type not in daily_stats[catch_date]:
+                        daily_stats[catch_date][fish_type] = 0
+                    daily_stats[catch_date][fish_type] += 1
         return daily_stats
     def computer_vision(e):
         """Handles the computer vision aspect of the application."""
@@ -554,7 +567,7 @@ class FishFlex(App):
         pass
 
     
-
+#endregion
 
 print(FishFlex.daily_stats("e"))
 if __name__ == '__main__': #main python code goes here
