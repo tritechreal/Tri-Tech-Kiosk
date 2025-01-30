@@ -1,0 +1,35 @@
+def get_box_coords():
+    # gets all of the detections
+    detections = last_results
+
+    #returns if boxes have not been drawn.
+    if detections is None:
+        return
+    
+    # creates lists for coords
+
+    x = []
+    y = []
+    w = []
+    h = []
+    
+    x_var, y_var, w_var, h_var = None
+    #loops through the boxes
+    for detection in detections:
+            x_var, y_var, w_var, h_var = detection.box
+            #adds coords to a list
+            x.append(x_var)
+            y.append(y_var)
+            w.append(w_var)
+            h.append(h_var)
+
+    #makes lists into tuples
+    x_tup = tuple(x)
+    y_tup = tuple(y)
+    w_tup = tuple(w)
+    h_tup = tuple(h)
+    
+    # zippes the lists so they can be returned
+    zipped = zip(x_tup, y_tup, w_tup, h_tup)
+    #returns the tuple of the zipped object
+    return tuple(zipped)

@@ -49,6 +49,8 @@ def parse_detections(metadata: dict):
             boxes = boxes[:, [1, 0, 3, 2]]
         boxes = np.array_split(boxes, 4, axis=1)
         boxes = zip(*boxes)
+        print(boxes)
+
 
     last_detections = [
         Detection(box, category, score, metadata)
@@ -76,6 +78,7 @@ def draw_detections(request, stream="main"):
     with MappedArray(request, stream) as m:
         for detection in detections:
             x, y, w, h = detection.box
+            # print(x, y, w, h)
             label = f"{labels[int(detection.category)]} ({detection.conf:.2f})"
 
             # Calculate text size and position
@@ -113,7 +116,7 @@ def draw_detections(request, stream="main"):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, help="Path of the model",
-                        default="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk")
+                        default="./ai_mod/network.rpk")
     parser.add_argument("--fps", type=int, help="Frames per second")
     parser.add_argument("--bbox-normalization", action=argparse.BooleanOptionalAction, help="Normalize bbox")
     parser.add_argument("--bbox-order", choices=["yx", "xy"], default="yx",
@@ -156,7 +159,7 @@ if __name__ == "__main__":
 
     # Defaults
     if intrinsics.labels is None:
-        with open("assets/coco_labels.txt", "r") as f:
+        with open("./yolo_fish2_imx_model/yolo_fish2_imx_model/labels.txt", "r") as f:
             intrinsics.labels = f.read().splitlines()
     intrinsics.update_with_defaults()
 
