@@ -1,7 +1,7 @@
 import argparse
 import sys
 from functools import lru_cache
-
+import time as t
 import cv2
 import numpy as np
 
@@ -11,6 +11,7 @@ from picamera2.devices.imx500 import (NetworkIntrinsics,
                                       postprocess_nanodet_detection)
 
 last_detections = []
+import threading
 
 
 class Detection:
@@ -69,6 +70,8 @@ def get_labels():
 
 def draw_detections(request, stream="main"):
     """Draw the detections for this request onto the ISP output."""
+    global last_results
+    last_results = None
     detections = last_results
     if detections is None:
         return
@@ -76,6 +79,9 @@ def draw_detections(request, stream="main"):
     with MappedArray(request, stream) as m:
         for detection in detections:
             x, y, w, h = detection.box
+            
+            
+            #detection = detection.box
             label = f"{labels[int(detection.category)]} ({detection.conf:.2f})"
 
             # Calculate text size and position
@@ -133,11 +139,15 @@ def get_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
+    global intrinsics
+    global args
     args = get_args()
-
+    print("mainloop starting")
     # This must be called before instantiation of Picamera2
+    global imx500
     imx500 = IMX500(args.model)
+    global picam2
     intrinsics = imx500.network_intrinsics
     if not intrinsics:
         intrinsics = NetworkIntrinsics()
@@ -175,5 +185,19 @@ if __name__ == "__main__":
 
     last_results = None
     picam2.pre_callback = draw_detections
+
     while True:
         last_results = parse_detections(picam2.capture_metadata())
+
+camera_thread = threading.Thread(target=main)
+
+
+
+def find_box():
+    print("finding")
+    camera_thread.start
+    return last_detections
+
+
+
+

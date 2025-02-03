@@ -7,8 +7,12 @@ passw = None
 from kivy.core.window import Window
 from kivy.config import Config
 import time
+import threading
+import os
+os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
+
 print(time.localtime())
-Config.read('config.ini')
+
 def load_data(filename):
     """Loads data from a JSON file."""
     try:
@@ -409,7 +413,18 @@ class Daily_Catches(Screen):
 class FishFlex(App):
 
     def build(self):
-        # Create the screen manager and sets up everything for navigation
+        # Configure graphics settings
+        Config.set('graphics', 'fullscreen', 1)
+        Config.set('graphics', 'resizable', 0)
+        Config.set('graphics', 'borderless', 1)  # Example: Set borderless to 1
+        Config.set('kivy', 'input_provider', 'sdl2')
+        # Configure input settings
+        Config.set('input', 'mouse', 'mouse,multitouch_sim')  # Combine with mouse provider
+        #Config.set('kivy', 'input_provider', 'sdl2')  # Example: Set input provider
+
+        # Apply the configuration
+        Config.write()
+        
         sm = ScreenManager()
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(SettingsScreen(name='settings'))
@@ -428,6 +443,7 @@ class FishFlex(App):
     
     def update_user(self, text): #for sign in and creaiting account
         global user
+        
         user = str(text)
         print("Variable updated:", user) #can comment these out, primarily for debug
 
@@ -559,9 +575,20 @@ class FishFlex(App):
                         daily_stats[catch_date][fish_type] = 0
                     daily_stats[catch_date][fish_type] += 1
         return daily_stats
+    def camera_proc():
+        import camera as cam
+        
+        print(cam.find_box())
+
+    cam_thread = threading.Thread(target=camera_proc)
+    cam_thread.daemon = True
+
     def computer_vision(e):
         """Handles the computer vision aspect of the application."""
         # Placeholder for computer vision code
+        FishFlex.cam_thread.start()
+        
+        #print("with a width of", cam.find_box()[1])
         FishFlex.log_data("fish", 10)  # Example: Log a fish catch with length 10
         FishFlex.register_catch(None)  # Example: Register a catch for the user
         pass
