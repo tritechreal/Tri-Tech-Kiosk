@@ -1,3 +1,7 @@
+from kivy.config import Config
+Config.set('input', 'keyboard_mode', 'dock')
+# Apply the configuration
+Config.write()
 from kivy.logger import Logger, LOG_LEVELS
 Logger.setLevel(LOG_LEVELS["info"])
 from kivy.app import App
@@ -7,10 +11,15 @@ import json
 user = None
 passw = None
 from kivy.core.window import Window
-from kivy.config import Config
+import camera as cam
 import time
 import threading
 import os
+import logging
+from kivy.uix.dropdown import DropDown
+# Create a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.CRITICAL)
 
 os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
 os.environ['KIVY_WINDOW'] = 'x11'
@@ -241,17 +250,18 @@ Builder.load_string("""
 <Fish_Stuff>:
     BoxLayout:
         Button:
-            text: 'Fish Stats  ' + '📊'
+            text: 'Fish Stats ' + '📊'
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'Fish_Stats'
         Button:
-            text: 'Upload Fish (Coming Soon)' + '🐟📸'
+            text: 'Upload Fish' + '🐟'
             font_name: 'seguiemj'
             font_size: 40
+            on_press: app.computer_vision()
         
         Button:
-            text: 'Leader Board  ' + '🥇🥈🥉'
+            text: 'Leader Board' + '🥇'
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'Leader_Board'
@@ -272,16 +282,16 @@ Builder.load_string("""
         
         Label:
             size_hint_y: None
-            size_hint_x: 0.6
+            size_hint_x: 1
             text_size: self.width, None
             height: self.texture_size[1]
             id: highest_score
             font_name: 'seguiemj'
-            font_size: 80
+            font_size: 60
         Button:
             text: 'Refresh  ' + '🔃'
             font_name: 'seguiemj'
-            font_size: 80
+            font_size: 60
             size_hint_y: None
             size_hint_x: 0.5
             text_size: self.width, None
@@ -291,7 +301,7 @@ Builder.load_string("""
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
 
-            font_size: 80
+            font_size: 60
             size_hint_y: None
             size_hint_x: 0.5
             text_size: self.width, None
@@ -300,12 +310,12 @@ Builder.load_string("""
 <Fish_Stats>:
     BoxLayout:
         Button:
-            text: 'Leader Board  ' + '🥇🥈🥉'
+            text: 'Leader Board' + '🥇'
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'Leader_Board'
         Button:
-            text: 'Daily Catches ' + '📅🐟'
+            text: 'Daily Catches' + '📅'
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'Daily_Catches'
@@ -317,21 +327,37 @@ Builder.load_string("""
             on_press: root.manager.current = 'menu'
 <Daily_Catches>:
     BoxLayout:
-        Label:
-            id: daily_catches
-            font_name: 'seguiemj'
-            font_size: 40
-        Button:
-            text: 'Refresh  ' + '🔃'
-            font_name: 'seguiemj'
-            font_size: 40
-            on_press: daily_catches.text = str(app.daily_stats())
+        
+        GridLayout:
+            rows: 1
+            cols: 1
+            Label:
+                id: a
+                font_name: 'seguiemj'
+                font_size: 60
+                height: 44
+                padding: 10
+           
+        
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
-            font_size: 40
-            on_press: root.manager.current = 'Fish_Stats'                    
-<admin>:
+            font_size: 60
+            size_hint_y: None
+            size_hint_x: 0.9
+            text_size: self.width, None
+            height: self.texture_size[1]
+            on_press: root.manager.current = 'Fish_Stats'
+        Button:
+            text: 'Refresh  ' + '🔃'
+            font_name: 'seguiemj'
+            font_size: 60
+            size_hint_y: None
+            size_hint_x: 0.9
+            text_size: self.width, None
+            height: self.texture_size[1]
+            on_press: a.text=app.daily_stats()
+<admin>:                
     BoxLayout:
         Button:
             text: 'Reset  ' + '🔃'
@@ -339,7 +365,7 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'reset'
         Button:
-            text: 'computer vision initialize' + '🤖'
+            text: 'start cam' + '🤖'
             font_name: 'seguiemj'           
             font_size: 40
             on_press: app.computer_vision()
@@ -410,7 +436,12 @@ class admin(Screen):
 class reset(Screen):
     pass
 class Daily_Catches(Screen):
+    
     pass
+class CustomDropDown(DropDown):
+    pass
+
+
 #Main thing, if you change the name it will change the name of the window, just be sure to change it at the bottom too
 #region main code
 class FishFlex(App):
@@ -526,23 +557,27 @@ class FishFlex(App):
 
 
     def leaderboard(e):
-        score_list = list() #preps to convert the json of scores to a list for sorting
+        score_list = list()  # Preps to convert the JSON of scores to a list for sorting
         users = load_data('users.json')
         scores = load_data('scores.json')
-        output = list()
+        output = ""  # Initialize output as a string
         for user in users:
             score_list.append(scores[user])
             print(f"Added user {user} with score of {scores[user]}")
-        score_list.sort() #this line sorts the list
+        score_list.sort()  # This line sorts the list
         sorted_users = sorted(users.keys(), key=lambda x: scores[x], reverse=True)
         for user in sorted_users:
             print(f"{user}: {scores[user]}")
-        for i in range(0,3):
+        for i in range(0, 3):
             print(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
-            output.append(f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}")
+            output += f"{i+1}: {sorted_users[i]} with a score of {scores[sorted_users[i]]}\n"  # Add each entry with a new line
             print(output)
         return output
-    
+        
+        
+        
+        
+        
     
     
     
@@ -580,31 +615,50 @@ class FishFlex(App):
                     if fish_type not in daily_stats[catch_date]:
                         daily_stats[catch_date][fish_type] = 0
                     daily_stats[catch_date][fish_type] += 1
-        return daily_stats
-    def camera_proc():
-        from kivy.logger import Logger, LOG_LEVELS
-        Logger.setLevel(LOG_LEVELS["info"])
-        import camera as cam
         
-        print(cam.find_box())
+        # Find top 3 most caught fish
+        top_3_fish = {}
+        for date, fish_counts in daily_stats.items():
+            sorted_fish_counts = sorted(fish_counts.items(), key=lambda item: item, reverse=True)
+            top_3_fish[date] = sorted_fish_counts[:3]  # Get the top 3 fish
 
-    cam_thread = threading.Thread(target=camera_proc)
+        # Format the output
+        output = ""
+        for date, fish_counts in top_3_fish.items():
+            output += f"{date}:\n"
+            for fish_type, count in fish_counts:
+                output += f"  {fish_type}: {count}\n"
+                
+        return output  
+        
+    
+        
+
+    cam_thread = threading.Thread(target=cam.main)
     cam_thread.daemon = True
 
     def computer_vision(e):
+        global box
+        global label
         """Handles the computer vision aspect of the application."""
         # Placeholder for computer vision code
-        FishFlex.cam_thread.start()
-        
-        #print("with a width of", cam.find_box()[1])
-        FishFlex.log_data("fish", 10)  # Example: Log a fish catch with length 10
-        FishFlex.register_catch(None)  # Example: Register a catch for the user
+        if FishFlex.cam_thread.is_alive():
+            if cam.find_box == None:
+                print("No fish, try again")
+            else:
+                box, label = cam.find_box()
+                print(box[3]) #this is the width... the format for box is x, y, w, h
+                FishFlex.log_data(label, box[3])  # Example: Log a fish catch with length 10
+                FishFlex.register_catch(None)
+        else: 
+            FishFlex.cam_thread.start()
+            
         pass
 
     
 #endregion
 
-print(FishFlex.daily_stats("e"))
+
 if __name__ == '__main__': #main python code goes here
     kiosk_app = FishFlex() #easteregg
     kiosk_app.run()

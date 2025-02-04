@@ -4,7 +4,11 @@ from functools import lru_cache
 import time as t
 import cv2
 import numpy as np
+import logging
 
+# Create a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.CRITICAL)  # Set the logging level to CRITICAL
 from picamera2 import MappedArray, Picamera2
 from picamera2.devices import IMX500
 from picamera2.devices.imx500 import (NetworkIntrinsics,
@@ -78,11 +82,13 @@ def draw_detections(request, stream="main"):
     labels = get_labels()
     with MappedArray(request, stream) as m:
         for detection in detections:
+            global label
             x, y, w, h = detection.box
-            
+            global object_box
+            object_box = detection.box
             
             #detection = detection.box
-            label = f"{labels[int(detection.category)]} ({detection.conf:.2f})"
+            label = labels[int(detection.category)]
 
             # Calculate text size and position
             (text_width, text_height), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
@@ -179,7 +185,7 @@ def main():
     config = picam2.create_preview_configuration(controls={"FrameRate": intrinsics.inference_rate}, buffer_count=12)
 
     imx500.show_network_fw_progress_bar()
-    picam2.start(config, show_preview=True)
+    picam2.start(config, show_preview=False) #OVER HERE TO SHOW CAMERA OR NOT --------------------------------------------------------------------------
 
     if intrinsics.preserve_aspect_ratio:
         imx500.set_auto_aspect_ratio()
@@ -190,19 +196,18 @@ def main():
     while True:
         last_results = parse_detections(picam2.capture_metadata())
         
-camera_thread = threading.Thread(target=main)
 
-blob = -1
+
+
 def find_box():
-    global blob
-    blob = blob+1
-    if blob == 0:
-        camera_thread.start()
-    else:
-        print(last_detections)
-        return last_detections
-        print("finding")
+    return object_box, label
+    
+        
+        
 
 if __name__ == '__main__':
     find_box()
+    t.sleep(10)
+    print(find_box())
+    
 
