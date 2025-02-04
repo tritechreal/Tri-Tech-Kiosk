@@ -1,3 +1,5 @@
+from kivy.logger import Logger, LOG_LEVELS
+Logger.setLevel(LOG_LEVELS["info"])
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -9,8 +11,9 @@ from kivy.config import Config
 import time
 import threading
 import os
-os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
 
+os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
+os.environ['KIVY_WINDOW'] = 'x11'
 print(time.localtime())
 
 def load_data(filename):
@@ -414,14 +417,17 @@ class FishFlex(App):
 
     def build(self):
         # Configure graphics settings
+        Config.set('kivy', 'input_provider', 'sdl2')
         Config.set('graphics', 'fullscreen', 1)
         Config.set('graphics', 'resizable', 0)
         Config.set('graphics', 'borderless', 1)  # Example: Set borderless to 1
-        Config.set('kivy', 'input_provider', 'sdl2')
-        # Configure input settings
-        Config.set('input', 'mouse', 'mouse,multitouch_sim')  # Combine with mouse provider
-        #Config.set('kivy', 'input_provider', 'sdl2')  # Example: Set input provider
+      
 
+        
+        # Configure input settings
+        Config.set('input', 'mouse', 'multitouch_sim')  # Combine with mouse provider
+        #Config.set('kivy', 'input_provider', 'sdl2')  # Example: Set input provider
+        Config.set('input', 'keyboard_mode', 'dock')
         # Apply the configuration
         Config.write()
         
@@ -576,6 +582,8 @@ class FishFlex(App):
                     daily_stats[catch_date][fish_type] += 1
         return daily_stats
     def camera_proc():
+        from kivy.logger import Logger, LOG_LEVELS
+        Logger.setLevel(LOG_LEVELS["info"])
         import camera as cam
         
         print(cam.find_box())

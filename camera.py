@@ -9,7 +9,7 @@ from picamera2 import MappedArray, Picamera2
 from picamera2.devices import IMX500
 from picamera2.devices.imx500 import (NetworkIntrinsics,
                                       postprocess_nanodet_detection)
-
+last_results = None
 last_detections = []
 import threading
 
@@ -71,7 +71,7 @@ def get_labels():
 def draw_detections(request, stream="main"):
     """Draw the detections for this request onto the ISP output."""
     global last_results
-    last_results = None
+    
     detections = last_results
     if detections is None:
         return
@@ -119,7 +119,7 @@ def draw_detections(request, stream="main"):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, help="Path of the model",
-                        default="./Ai/network.rpk")
+                        default="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk")
     parser.add_argument("--fps", type=int, help="Frames per second")
     parser.add_argument("--bbox-normalization", action=argparse.BooleanOptionalAction, help="Normalize bbox")
     parser.add_argument("--bbox-order", choices=["yx", "xy"], default="yx",
@@ -140,6 +140,7 @@ def get_args():
 
 
 def main():
+    global last_results
     global intrinsics
     global args
     args = get_args()
@@ -166,7 +167,7 @@ def main():
 
     # Defaults
     if intrinsics.labels is None:
-        with open("/home/rasp/repos/project/Ai/labels.txt", "r") as f:
+        with open("assets/coco_labels.txt", "r") as f:
             intrinsics.labels = f.read().splitlines()
     intrinsics.update_with_defaults()
 
@@ -183,21 +184,25 @@ def main():
     if intrinsics.preserve_aspect_ratio:
         imx500.set_auto_aspect_ratio()
 
-    last_results = None
+   
     picam2.pre_callback = draw_detections
 
     while True:
         last_results = parse_detections(picam2.capture_metadata())
-
+        
 camera_thread = threading.Thread(target=main)
 
-
-
+blob = -1
 def find_box():
-    print("finding")
-    camera_thread.start
-    return last_detections
+    global blob
+    blob = blob+1
+    if blob == 0:
+        camera_thread.start()
+    else:
+        print(last_detections)
+        return last_detections
+        print("finding")
 
-
-
+if __name__ == '__main__':
+    find_box()
 
