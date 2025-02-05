@@ -23,7 +23,6 @@ logger.setLevel(logging.CRITICAL)
 
 os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
 os.environ['KIVY_WINDOW'] = 'x11'
-print(time.localtime())
 
 def load_data(filename):
     """Loads data from a JSON file."""
@@ -627,8 +626,7 @@ class FishFlex(App):
         for date, fish_counts in top_3_fish.items():
             output += f"{date}:\n"
             for fish_type, count in fish_counts:
-                output += f"  {fish_type}: {count}\n"
-                
+                output += f"  {fish_type}: {count}\n"  
         return output  
         
     
@@ -660,6 +658,6 @@ class FishFlex(App):
 
 
 if __name__ == '__main__': #main python code goes here
-    kiosk_app = FishFlex() #easteregg
+    kiosk_app = FishFlex()
+    FishFlex.cam_thread.start()
     kiosk_app.run()
-    
