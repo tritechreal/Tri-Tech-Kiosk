@@ -30,6 +30,7 @@ def parse_detections(metadata: dict):
     """Parse the output tensor into a number of detected objects, scaled to the ISP output."""
     global last_detections
     bbox_normalization = intrinsics.bbox_normalization
+    # bbox_normalization = True
     bbox_order = intrinsics.bbox_order
     threshold = args.threshold
     iou = args.iou
@@ -71,10 +72,11 @@ def get_labels():
         labels = [label for label in labels if label and label != "-"]
     return labels
 
-
+# idx = 0
 def draw_detections(request, stream="main"):
     """Draw the detections for this request onto the ISP output."""
     global last_results
+    global idx
     
     detections = last_results
     if detections is None:
@@ -120,15 +122,19 @@ def draw_detections(request, stream="main"):
             color = (255, 0, 0)  # red
             cv2.putText(m.array, "ROI", (b_x + 5, b_y + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
             cv2.rectangle(m.array, (b_x, b_y), (b_x + b_w, b_y + b_h), (255, 0, 0, 0))
+        # idx = idx + 1
+        # if idx == 100:
+        #     cv2.imwrite("./test.png", m.array)
+        #     exit(0)
 
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, help="Path of the model",
-                        default="/usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk")
+                        default="/home/rasp/repos/project/Ai/network.rpk") #demo ---> /usr/share/imx500-models/imx500_network_ssd_mobilenetv2_fpnlite_320x320_pp.rpk
     parser.add_argument("--fps", type=int, help="Frames per second")
-    parser.add_argument("--bbox-normalization", action=argparse.BooleanOptionalAction, help="Normalize bbox")
-    parser.add_argument("--bbox-order", choices=["yx", "xy"], default="yx",
+    parser.add_argument("--bbox-normalization", action=argparse.BooleanOptionalAction, default=True, help="Normalize bbox")
+    parser.add_argument("--bbox-order", choices=["yx", "xy"], default="xy",
                         help="Set bbox order yx -> (y0, x0, y1, x1) xy -> (x0, y0, x1, y1)")
     parser.add_argument("--threshold", type=float, default=0.55, help="Detection threshold")
     parser.add_argument("--iou", type=float, default=0.65, help="Set iou threshold")
@@ -173,7 +179,7 @@ def main():
 
     # Defaults
     if intrinsics.labels is None:
-        with open("assets/coco_labels.txt", "r") as f:
+        with open("/home/rasp/repos/project/Ai/labels.txt", "r") as f:   #demo ----->  assets/coco_labels.txt
             intrinsics.labels = f.read().splitlines()
     intrinsics.update_with_defaults()
 
@@ -206,8 +212,6 @@ def find_box():
         
 
 if __name__ == '__main__':
-    find_box()
-    t.sleep(10)
-    print(find_box())
+    main()  
     
 
