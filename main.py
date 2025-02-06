@@ -24,6 +24,14 @@ logger.setLevel(logging.CRITICAL)
 os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
 os.environ['KIVY_WINDOW'] = 'x11'
 
+global Debug
+Debug = True #sets debug to true for print statment debugging
+global pixle_scale
+pixle_scale = 0.73705179282 #multiply this by the # of pixles converts it to mm
+pixle_scale_small = 0.74285714285
+
+
+
 def load_data(filename):
     """Loads data from a JSON file."""
     try:
@@ -41,14 +49,16 @@ def sync_users_and_scores():  #Ensures that all users have an entry in the score
     try:
         users = load_data('users.json')
         scores = load_data('scores.json')
-       #print("Users:", users)  # Debug: Print loaded users
-       #print("Scores:", scores)  # Debug: Print loaded scores
+        if Debug == True:
+            print("Users:", users)  # Debug: Print loaded users
+            print("Scores:", scores)  # Debug: Print loaded scores
         for user in users:
             if user not in scores: #if the user is not present, add them
                 scores[user] = 0
                 print(f"Added user {user} to scores with score 0.")
         save_data('scores.json', scores)
-        print("Users and scores synchronized.")
+        if Debug == True:
+            print("Users and scores synchronized.")
     except Exception as e:
         print(f"An error occurred during synchronization: {e}")
 sync_users_and_scores() #keeps new accounts on the scores list to keep original account system
@@ -62,11 +72,11 @@ Builder.load_string("""
 <MenuScreen>:
     BoxLayout:
         
-        Button:
-            text: 'Settings  ' + '⚙️'
-            font_name: 'seguiemj'
-            font_size: 40
-            on_press: root.manager.current = 'settings'
+        # Button:
+        #     text: 'Settings  ' + '⚙️'
+        #     font_name: 'seguiemj'
+        #     font_size: 40
+        #     on_press: root.manager.current = 'settings'
         Button:
             text: 'Account  ' + '👤'
             font_name: 'seguiemj'
@@ -88,6 +98,16 @@ Builder.load_string("""
     title: 'You are now signed in!'         
     Button:
         text: 'You have been signed in! ✅' + '   (Click popup to continue)'
+        font_name: 'seguiemj'
+        font_size: 60
+        on_release: root.dismiss()
+                    
+<Fish@Popup>:
+    auto_dismiss: False
+    on_dismiss: print("Popup dismissed")
+    title: 'Fish Detected'         
+    Button:
+        text: 'A ' + app.get_label() + '   (Click popup to continue)'
         font_name: 'seguiemj'
         font_size: 60
         on_release: root.dismiss()
@@ -257,7 +277,9 @@ Builder.load_string("""
             text: 'Upload Fish' + '🐟'
             font_name: 'seguiemj'
             font_size: 40
-            on_press: app.computer_vision()
+            on_press: 
+                app.computer_vision()
+                Factory.Fish().open()
         
         Button:
             text: 'Leader Board' + '🥇'
@@ -481,12 +503,14 @@ class FishFlex(App):
         global user
         
         user = str(text)
-        print("Variable updated:", user) #can comment these out, primarily for debug
+        if Debug == True:
+            print("Variable updated:", user) #can comment these out, primarily for debug
 
     def update_pass(self, text): #for sign in and creaiting account
         global passw
         passw = str(text)
-        print("Variable updated:", passw) #can comment these out, primarily for debug
+        if Debug == True:
+            print("Variable updated:", passw) #can comment these out, primarily for debug
 
     def create_user(e): #creates new user
         """Creates a new user with the given username and password."""
@@ -543,7 +567,8 @@ class FishFlex(App):
         scores = load_data('scores.json')
         for user1 in users:
             score_list.append(scores[user1])
-            print(f"Added user {user1} with score of {scores[user1]}")
+            if Debug == True:
+                print(f"Added user {user1} with score of {scores[user1]}")
         score_list.sort() #this line sorts the list
         for user1 in users: #for each user in the user list (repeats for duration  of the user list)
             if scores[user1] == score_list[-1]: #if the score matches the last item on the sorted list (highest)
@@ -641,18 +666,31 @@ class FishFlex(App):
         """Handles the computer vision aspect of the application."""
         # Placeholder for computer vision code
         if FishFlex.cam_thread.is_alive():
-            if cam.find_box == None:
+            if cam.find_box() == None:
                 print("No fish, try again")
             else:
                 box, label = cam.find_box()
-                print(box[3]) #this is the width... the format for box is x, y, w, h
+                if Debug == True:
+                    print(box[3]) #this is the width... the format for box is x, y, w, h
                 FishFlex.log_data(label, box[3])  # Example: Log a fish catch with length 10
                 FishFlex.register_catch(None)
         else: 
             FishFlex.cam_thread.start()
-            
         pass
-
+    
+    def get_label(e):
+        if label == "big_fish":
+            if ((box[3] * pixle_scale)-185) > 15 or ((box[3] * pixle_scale)-185) < -15:
+                return ("Bluefish" + " has been detected" + f"\n" + "length of 185 mm" + f"\n" + f"\n")
+            else:
+                return ("Bluefish" + " has been detected" + f"\n" + "length of " + str(box[3] * pixle_scale) + " mm" + f"\n" + f"\n")
+        
+        elif label == "small_fish":
+            if ((box[3] * pixle_scale_small)-140) > 15 or ((box[3] * pixle_scale_small)-140) < -15:
+                return ("Snapper" + " has been detected" + f"\n" + "length of 140 mm" + f"\n" + f"\n")
+            else:
+                return ("Snapper" + " has been detected" + f"\n" + "length of " + str(box[3] * pixle_scale) + " mm" + f"\n" + f"\n")
+            
     
 #endregion
 
@@ -660,4 +698,6 @@ class FishFlex(App):
 if __name__ == '__main__': #main python code goes here
     kiosk_app = FishFlex()
     FishFlex.cam_thread.start()
+    if Debug == True:
+        print("starting camera thread, please wait.")
     kiosk_app.run()

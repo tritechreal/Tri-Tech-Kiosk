@@ -5,7 +5,7 @@ import time as t
 import cv2
 import numpy as np
 import logging
-
+global object_box
 # Create a logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.CRITICAL)  # Set the logging level to CRITICAL
@@ -39,7 +39,7 @@ def parse_detections(metadata: dict):
     np_outputs = imx500.get_outputs(metadata, add_batch=True)
     input_w, input_h = imx500.get_input_size()
     if np_outputs is None:
-        return last_detections
+        return None
     if intrinsics.postprocess == "nanodet":
         boxes, scores, classes = \
             postprocess_nanodet_detection(outputs=np_outputs[0], conf=threshold, iou_thres=iou,
@@ -87,9 +87,8 @@ def draw_detections(request, stream="main"):
             global label
             x, y, w, h = detection.box
             global object_box
-            object_box = detection.box
             
-            #detection = detection.box
+            object_box = detection.box
             label = labels[int(detection.category)]
 
             # Calculate text size and position
@@ -136,7 +135,7 @@ def get_args():
     parser.add_argument("--bbox-normalization", action=argparse.BooleanOptionalAction, default=True, help="Normalize bbox")
     parser.add_argument("--bbox-order", choices=["yx", "xy"], default="xy",
                         help="Set bbox order yx -> (y0, x0, y1, x1) xy -> (x0, y0, x1, y1)")
-    parser.add_argument("--threshold", type=float, default=0.55, help="Detection threshold")
+    parser.add_argument("--threshold", type=float, default=0.65, help="Detection threshold")
     parser.add_argument("--iou", type=float, default=0.65, help="Set iou threshold")
     parser.add_argument("--max-detections", type=int, default=10, help="Set max detections")
     parser.add_argument("--ignore-dash-labels", action=argparse.BooleanOptionalAction, help="Remove '-' labels ")
@@ -206,8 +205,14 @@ def main():
 
 
 def find_box():
-    return object_box, label
-    
+    try:
+        object_box
+        # If the code reaches here, my_variable exists
+        return object_box, label
+    except NameError:
+        return None
+            
+        
         
         
 
