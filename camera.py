@@ -8,7 +8,7 @@ import logging
 global object_box
 # Create a logger
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.CRITICAL)  # Set the logging level to CRITICAL
+# logger.setLevel(logging.CRITICAL)  # Set the logging level to CRITICAL
 from picamera2 import MappedArray, Picamera2
 from picamera2.devices import IMX500
 from picamera2.devices.imx500 import (NetworkIntrinsics,

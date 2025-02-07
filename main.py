@@ -1,3 +1,4 @@
+
 from kivy.config import Config
 Config.set('input', 'keyboard_mode', 'dock')
 # Apply the configuration
@@ -17,12 +18,14 @@ import threading
 import os
 import logging
 from kivy.uix.dropdown import DropDown
-# Create a logger
+
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("picamera2").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.CRITICAL)
+logger.setLevel(logging.INFO)
 
 os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
-os.environ['KIVY_WINDOW'] = 'x11'
+# os.environ['KIVY_WINDOW'] = 'x11'
 
 global Debug
 Debug = True #sets debug to true for print statment debugging
@@ -91,7 +94,7 @@ Builder.load_string("""
             text: 'Quit ' + '❌'
             font_name: 'seguiemj'
             font_size: 40
-            on_press: raise Exception("User quit program")
+            on_press: exit(0)
 <MyPopup@Popup>:
     auto_dismiss: False
     on_dismiss: print("Popup dismissed")
@@ -479,7 +482,7 @@ class FishFlex(App):
         # Configure input settings
         Config.set('input', 'mouse', 'multitouch_sim')  # Combine with mouse provider
         #Config.set('kivy', 'input_provider', 'sdl2')  # Example: Set input provider
-        Config.set('input', 'keyboard_mode', 'dock')
+        Config.set('kivy', 'keyboard_mode', 'dock')
         # Apply the configuration
         Config.write()
         
