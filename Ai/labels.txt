@@ -1,2 +1,2 @@
-small_fish
-big_fish
+Snapper
+Bluefish

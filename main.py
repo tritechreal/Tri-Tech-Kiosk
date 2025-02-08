@@ -75,11 +75,11 @@ Builder.load_string("""
 <MenuScreen>:
     BoxLayout:
         
-        # Button:
-        #     text: 'Settings  ' + '⚙️'
-        #     font_name: 'seguiemj'
-        #     font_size: 40
-        #     on_press: root.manager.current = 'settings'
+        Button:
+            text: 'Settings  ' + '⚙️'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: root.manager.current = 'settings'
         Button:
             text: 'Account  ' + '👤'
             font_name: 'seguiemj'
@@ -90,11 +90,11 @@ Builder.load_string("""
             font_name: 'seguiemj'
             font_size: 40
             on_press: root.manager.current = 'Fish_Stuff'
-        Button:
-            text: 'Quit ' + '❌'
-            font_name: 'seguiemj'
-            font_size: 40
-            on_press: exit(0)
+        # Button:
+        #     text: 'Quit ' + '❌'
+        #     font_name: 'seguiemj'
+        #     font_size: 40
+        #     on_press: exit(0)
 <MyPopup@Popup>:
     auto_dismiss: False
     on_dismiss: print("Popup dismissed")
@@ -102,7 +102,7 @@ Builder.load_string("""
     Button:
         text: 'You have been signed in! ✅' + '   (Click popup to continue)'
         font_name: 'seguiemj'
-        font_size: 60
+        font_size: 40
         on_release: root.dismiss()
                     
 <Fish@Popup>:
@@ -123,7 +123,10 @@ Builder.load_string("""
             font_size: 40
             on_press: root.manager.current = 'admin'
         Button:
-            text: 'My settings button'
+            text: 'Quit ' + '❌'
+            font_name: 'seguiemj'
+            font_size: 40
+            on_press: exit(0)
         Button:
             text: 'Back  ' + '↩️'
             font_name: 'seguiemj'
@@ -601,14 +604,6 @@ class FishFlex(App):
             print(output)
         return output
         
-        
-        
-        
-        
-    
-    
-    
-    
     def log_data(fish_type, length):
         """Logs data for a given fish type and length."""
         data = load_data('fish_data.json')
@@ -677,22 +672,24 @@ class FishFlex(App):
                     print(box[3]) #this is the width... the format for box is x, y, w, h
                 FishFlex.log_data(label, box[3])  # Example: Log a fish catch with length 10
                 FishFlex.register_catch(None)
-        else: 
-            FishFlex.cam_thread.start()
+        else:
+            print("hello")
+           # FishFlex.cam_thread.start()
         pass
-    
+    def mm_to_in():
+        return round((box[3] * pixle_scale)/25.4)
     def get_label(e):
-        if label == "big_fish":
+        if label == "Bluefish":
             if ((box[3] * pixle_scale)-185) > 15 or ((box[3] * pixle_scale)-185) < -15:
-                return ("Bluefish" + " has been detected" + f"\n" + "length of 185 mm" + f"\n" + f"\n")
+                return ("Bluefish" + " has been detected" + f"\n" + "length of 7.2 in" + f"\n" + f"\n")
             else:
-                return ("Bluefish" + " has been detected" + f"\n" + "length of " + str(box[3] * pixle_scale) + " mm" + f"\n" + f"\n")
+                return ("Bluefish" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")
         
-        elif label == "small_fish":
+        elif label == "Snapper":
             if ((box[3] * pixle_scale_small)-140) > 15 or ((box[3] * pixle_scale_small)-140) < -15:
-                return ("Snapper" + " has been detected" + f"\n" + "length of 140 mm" + f"\n" + f"\n")
+                return ("Snapper" + " has been detected" + f"\n" + "length of 5.5 in+" + f"\n" + f"\n")
             else:
-                return ("Snapper" + " has been detected" + f"\n" + "length of " + str(box[3] * pixle_scale) + " mm" + f"\n" + f"\n")
+                return ("Snapper" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")
             
     
 #endregion
