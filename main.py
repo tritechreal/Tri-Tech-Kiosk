@@ -9,8 +9,6 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import json
-user = None
-passw = None
 from kivy.core.window import Window
 import camera as cam
 import time
@@ -18,21 +16,19 @@ import threading
 import os
 import logging
 from kivy.uix.dropdown import DropDown
-
+#Sets vars
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("picamera2").setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
 os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
-# os.environ['KIVY_WINDOW'] = 'x11'
-
+user = None
+passw = None
 global Debug
 Debug = True #sets debug to true for print statment debugging
 global pixle_scale
 pixle_scale = 0.99465240641 #multiply this by the # of pixles converts it to mm
 pixle_scale_small = 0.99465240641
-
 label = None
 
 def load_data(filename):
@@ -507,7 +503,6 @@ class FishFlex(App):
     
     def update_user(self, text): #for sign in and creaiting account
         global user
-        
         user = str(text)
         if Debug == True:
             print("Variable updated:", user) #can comment these out, primarily for debug
@@ -523,7 +518,6 @@ class FishFlex(App):
         if not user or not passw:
             print("Cannot create a blank user.")
             return
-
         users = load_data('users.json')
         if user in users:
             print("Username already exists.")
@@ -531,6 +525,7 @@ class FishFlex(App):
             users[user] = passw
             save_data('users.json', users)
             print(f"User {user} created successfully.")
+
     def authenticate_user(e): #Login existing user
         """Authenticates a user based on the given username and password."""
         if not user or not passw:
