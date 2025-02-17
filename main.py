@@ -30,10 +30,10 @@ os.environ['SDL_MOUSE_TOUCH_EVENTS'] = '1'
 global Debug
 Debug = True #sets debug to true for print statment debugging
 global pixle_scale
-pixle_scale = 0.73705179282 #multiply this by the # of pixles converts it to mm
-pixle_scale_small = 0.74285714285
+pixle_scale = 0.99465240641 #multiply this by the # of pixles converts it to mm
+pixle_scale_small = 0.99465240641
 
-
+label = None
 
 def load_data(filename):
     """Loads data from a JSON file."""
@@ -285,7 +285,7 @@ Builder.load_string("""
             font_size: 40
             on_press: 
                 app.computer_vision()
-                Factory.Fish().open()
+                if app.get_label() is not None: Factory.Fish().open()
         
         Button:
             text: 'Leader Board' + '🥇'
@@ -674,11 +674,13 @@ class FishFlex(App):
                 FishFlex.register_catch(None)
         else:
             print("hello")
-           # FishFlex.cam_thread.start()
+            #FishFlex.cam_thread.start()
         pass
     def mm_to_in():
-        return round((box[3] * pixle_scale)/25.4)
+        return (round(((box[3] * pixle_scale)/25.4)*10))/10
     def get_label(e):
+        if label is None:
+            return
         if label == "Bluefish":
             if ((box[3] * pixle_scale)-185) > 15 or ((box[3] * pixle_scale)-185) < -15:
                 return ("Bluefish" + " has been detected" + f"\n" + "length of 7.2 in" + f"\n" + f"\n")
