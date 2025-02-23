@@ -17,7 +17,7 @@ cam.start_preview(Preview.QTGL)
 cam.start()
 
 
-for i in range(1,100):
+for i in range(200,401):
     num = str(i)
     time.sleep(0.2)
     filename = "data/" + num + "fish" + '.png'

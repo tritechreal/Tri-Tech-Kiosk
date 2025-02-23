@@ -27,8 +27,8 @@ passw = None
 global Debug
 Debug = True #sets debug to true for print statment debugging
 global pixle_scale
-pixle_scale = 0.99465240641 #multiply this by the # of pixles converts it to mm
-pixle_scale_small = 0.99465240641
+pixle_scale = 1.17647058824 #multiply this by the # of pixles converts it to mm
+pixle_scale_small = 1.17647058824
 label = None
 
 def load_data(filename):
@@ -676,18 +676,27 @@ class FishFlex(App):
     def get_label(e):
         if label is None:
             return
-        if label == "Bluefish":
+        if label == "bluefish":
             if ((box[3] * pixle_scale)-185) > 15 or ((box[3] * pixle_scale)-185) < -15:
                 return ("Bluefish" + " has been detected" + f"\n" + "length of 7.2 in" + f"\n" + f"\n")
             else:
                 return ("Bluefish" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")
         
-        elif label == "Snapper":
+        elif label == "snapper":
             if ((box[3] * pixle_scale_small)-140) > 15 or ((box[3] * pixle_scale_small)-140) < -15:
-                return ("Snapper" + " has been detected" + f"\n" + "length of 5.5 in+" + f"\n" + f"\n")
+                return ("Snapper" + " has been detected" + f"\n" + "length of 5.5 in" + f"\n" + f"\n")
             else:
                 return ("Snapper" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")
-            
+        elif label == "bass":
+            if ((box[3] * pixle_scale_small)-270) > 15 or ((box[3] * pixle_scale_small)-270) < -15:
+                return ("Bass" + " has been detected" + f"\n" + "length of 10.6 in" + f"\n" + f"\n")
+            else:
+                return ("Bass" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")
+        elif label == "snook":
+            if ((box[3] * pixle_scale_small)-285) > 15 or ((box[3] * pixle_scale_small)-285) < -15:
+                return ("Snook" + " has been detected" + f"\n" + "length of 11.2 in" + f"\n" + f"\n")
+            else:
+                return ("Snook" + " has been detected" + f"\n" + "length of " + str(FishFlex.mm_to_in()) + " in" + f"\n" + f"\n")    
     
 #endregion
 
