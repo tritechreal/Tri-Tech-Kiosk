@@ -17,7 +17,6 @@ last_results = None
 last_detections = []
 import threading
 
-
 class Detection:
     def __init__(self, coords, category, conf, metadata):
         """Create a Detection object, recording the bounding box, category and confidence."""
@@ -55,6 +54,11 @@ def parse_detections(metadata: dict):
             boxes = boxes[:, [1, 0, 3, 2]]
         boxes = np.array_split(boxes, 4, axis=1)
         boxes = zip(*boxes)
+
+    # labels = get_labels()
+    # for _, score, category in zip(boxes, scores, classes):
+    #     if score > 0.4:
+    #         print(f"{labels[int(category)]}: {str(score)}")
 
     last_detections = [
         Detection(box, category, score, metadata)
